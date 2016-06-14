@@ -24,7 +24,7 @@ function($, _, Backbone, nicescroll){
     map.setCenter(new OpenLayers.LonLat(120.25, 30.25).transform(
             new OpenLayers.Projection("EPSG:4326"),
             map.getProjectionObject()
-        ), 12);
+        ), 18);
 
 
     var LocatorCollection = Backbone.Collection.extend({
@@ -82,11 +82,22 @@ function($, _, Backbone, nicescroll){
     		var code = $(e.currentTarget).attr('data');
     		var marker = _.findWhere(this.layer.markers, {'code':code});
     		if (!marker) return;
-    		map.setCenter(marker.lonlat);
+    	    map.moveTo(marker.lonlat, 17);
+    	    map.zoomTo(18);
+    	},
+    	/*
+    	openlayers2 api 在https协议下 定位会出现问题；定位的时候强制做一次缩放地图，让部分地图参数归0;
+    	*/
+    	_httpsCenterAt:function(map, lonlat){
+    	    var zoom = map.zoom;
+    	    var offset = -1;
+    	    if (zoom === 0) offset = 1;
+    	    map.moveTo(lonlat, zoom + offset);
+    	    map.zoomTo(zoom - offset);
     	},
     	_template:function(){
     		var str = '<% _.each(data, function(item){ %>'+
-    			'<div class="locator-item" data="<%= item.code %>" style="height:32px;line-height:32px;border-bottom:dashed 1px #a8a8a8;"><%= item.name %></div>'+
+    			'<div class="list-item locator-item" data="<%= item.code %>"><%= item.name %></div>'+
     		'<% }) %>';
     		return str;
     	},

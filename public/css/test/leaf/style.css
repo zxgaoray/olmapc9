@@ -17,3 +17,10 @@
     background-color: #fff;
     z-index: 9999;
 }
+
+.list-item {
+    height:32px;
+    line-height:32px;
+    border-bottom:dashed 1px #a8a8a8;
+    padding-left: 20px;
+}
