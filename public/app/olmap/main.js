@@ -1,10 +1,13 @@
 require.config({
     paths:{
-        'jquery':'http://cdn.bootcss.com/jquery/1.12.4/jquery.min.js',
-        'bootstrap':'http://cdn.bootcss.com/bootstrap/2.3.2/js/bootstrap.min.js',
-        'underscore':'http://cdn.bootcss.com/underscore.js/1.8.3/underscore-min.js',
-        'backbone':'http://cdn.bootcss.com/backbone.js/1.3.3/backbone-min.js',
+        'jquery':'https://cdn.bootcss.com/jquery/1.12.4/jquery.min',
+        'bootstrap':'https://cdn.bootcss.com/bootstrap/2.3.2/js/bootstrap.min',
+        'underscore':'https://cdn.bootcss.com/underscore.js/1.8.3/underscore-min',
+        'backbone':'https://cdn.bootcss.com/backbone.js/1.3.3/backbone-min',
         'app':'/app'
+    },
+    shim:{
+        'bootstrap':['jquery']
     }
 })
 

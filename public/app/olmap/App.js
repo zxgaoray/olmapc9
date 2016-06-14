@@ -2,11 +2,15 @@ define('app/olmap/App',
 [
     'jquery',
     'underscore',
-    'backbone'
+    'backbone',
+    'app/olmap/controller/Router'
 ],
-function($, _, Backbone){
+function($, _, Backbone, Router){
     function initialize(){
         console.log('init');
+        
+        var router = new Router({});
+        Backbone.history.start();
     }
     
     return {

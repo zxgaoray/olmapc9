@@ -1,0 +1,19 @@
+.map-container {
+    position: absolute;
+    top: 0px;
+    right: 0px;
+    left: 0px;
+    bottom: 0px;
+}
+
+.map-toc {
+    position: absolute;
+    top: 20px;
+    right: 20px;
+    bottom: 40px;
+    width: 300px;
+    border:solid 1px #a8a8a8;
+    box-sizing: border-box;
+    background-color: #fff;
+    z-index: 9999;
+}
