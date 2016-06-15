@@ -18,9 +18,16 @@ router.get('/leaf', function(req, res, next) {
   res.render('test/leaf/leaf');
 });
 
+router.get('/ags', function(req, res, next) {
+  res.render('test/ags/ags');
+});
+
 router.get('/staticmap', function(req, res, next) {
   res.render('test/staticmap/index');
 });
 
+router.get('/ags3d', function(req, res, next) {
+    res.render('test/ags3d/index');
+})
 
 module.exports = router;
