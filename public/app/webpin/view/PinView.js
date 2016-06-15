@@ -3,7 +3,7 @@ define('app/webpin/view/PinView',
     'jquery',
     'underscore',
     'backbone',
-    'text!/app/webpin/template/PinView.ejs',
+    'text!app/webpin/template/PinView.ejs',
     
     'app/webpin/collection/PinCollection'
 ],

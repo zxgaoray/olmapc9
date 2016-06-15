@@ -2,6 +2,16 @@ html
   head
     link(rel="stylesheet", href="https://cdn.bootcss.com/bootstrap/3.3.6/css/bootstrap.min.css")
   body
-    div(class="container")
-      div(id="pin-view", class="row")
+    nav(class="navbar navbar-default")
+      div(class="navbar-header")
+        button(type="button", class="navbar-toggle collapsed")
+        a(class="navbar-brand", href="#")
+      div(class="collapse navbar-collapse")
+        ul(class="nav nav-pills")
+          li
+            a(href="#") Home
+          li
+            a(href="#", class="active") Web pins
+    div(id="pin-view", class="container")
+      
   script(src="https://cdn.bootcss.com/require.js/2.2.0/require.min.js", data-main="/app/webpin/main.js")

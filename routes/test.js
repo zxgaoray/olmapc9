@@ -18,5 +18,9 @@ router.get('/leaf', function(req, res, next) {
   res.render('test/leaf/leaf');
 });
 
+router.get('/staticmap', function(req, res, next) {
+  res.render('test/staticmap/index');
+});
+
 
 module.exports = router;

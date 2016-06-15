@@ -13,25 +13,36 @@ router.get('/webpins', function(req, res, next) {
                 code:'webpin1',
                 name:'ol2',
                 pin:'/test/ol2',
-                descript:''
+                descript:'',
+                img:'http://www.easyicon.net/api/resizeApi.php?id=1061274&size=128'
             },
             {
                 code:'webpin2',
                 name:'ol3',
                 pin:'/test/ol3',
-                descript:''
+                descript:'',
+                img:'http://www.easyicon.net/api/resizeApi.php?id=1061273&size=128'
             },
             {
                 code:'webpin3',
                 name:'leaflet',
                 pin:'/test/leaf',
-                descript:''
+                descript:'',
+                img:'http://www.easyicon.net/api/resizeApi.php?id=1185657&size=128'
             },
             {
                 code:'webpin4',
                 name:'ags',
                 pin:'/test/ags',
-                descript:''
+                descript:'',
+                img:'http://www.easyicon.net/api/resizeApi.php?id=1195280&size=128'
+            },
+            {
+                code:'webpin5',
+                name:'static map',
+                pin:'/test/staticmap',
+                descript:'',
+                img:'http://www.easyicon.net/api/resizeApi.php?id=1185657&size=128'
             }
         ]
     });
