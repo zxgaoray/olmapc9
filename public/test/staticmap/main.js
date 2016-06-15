@@ -17,6 +17,10 @@ require(
 	,'backbone'
 ],
 function($, _, Backbone, nicescroll){
+    $('body').bind('contextmenu',function(){
+        return false;
+    });
+    
     var imgSizeLod = {
         0 : [4, 2],
         1 : [4, 2],
@@ -90,10 +94,15 @@ function($, _, Backbone, nicescroll){
     		var marker = new OpenLayers.Marker(lonlat, icon);
     		marker.code = item.code;
     		
-    		marker.events.register('click', this, function(e){
-                var lonlat = e.object.lonlat;
-                var txt = e.object.code;
-                activePopup(lonlat, txt);
+    		marker.events.register('mousedown', this, function(e){
+        		if (OpenLayers.Event.isRightClick(e)) { 
+        		    var lonlat = e.object.lonlat;
+                    var txt = e.object.code;
+                    activePopup(lonlat, txt);
+                     
+                }else{
+                    alert("Left button click");
+                }
             })
     		
     		pinLayer.addMarker(marker);
