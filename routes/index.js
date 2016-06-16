@@ -48,6 +48,14 @@ router.get('/webpins', function(req, res, next) {
                 denpences:'requirejs backbone openlayers2',
                 descript:'static map',
                 img:'http://www.easyicon.net/api/resizeApi.php?id=1185657&size=128'
+            },
+            {
+                code:'webpin6',
+                name:'ags 3d',
+                pin:'/test/ags3d',
+                denpences:'requirejs backbone arcgis_js_api',
+                descript:'',
+                img:'http://www.easyicon.net/api/resizeApi.php?id=1195280&size=128'
             }
         ]
     });
