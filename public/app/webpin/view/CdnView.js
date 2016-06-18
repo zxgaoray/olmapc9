@@ -1,18 +1,19 @@
-define('app/webpin/view/PinView',
+define('app/webpin/view/CdnView',
 [
     'jquery',
     'underscore',
     'backbone',
-    'text!app/webpin/template/PinView.ejs',
+    'text!app/webpin/template/CdnView.ejs',
     
-    'app/webpin/collection/PinCollection'
+    'app/webpin/collection/CdnCollection'
 ],
-function($, _, Backbone, tmpl, PinCollection){
-    var PinView = Backbone.View.extend({
-        el:'#pin-view',
+function($, _, Backbone, tmpl, CdnCollection){
+    var v = Backbone.View.extend({
+        el:'#cdn-view',
         initialize:function(){
-            this.collection = new PinCollection();
-            this.collection.on('reset', this._listReset, this);
+            this.collection = new CdnCollection();
+            this.collection.on('reset', this._fetchedData, this);
+            
             this.template = _.template(tmpl);
         },
         render:function(){
@@ -23,10 +24,10 @@ function($, _, Backbone, tmpl, PinCollection){
         fetchData:function(){
             this.collection.fetchData();
         },
-        _listReset:function(){
+        _fetchedData:function(){
             this.render();
         }
     })
     
-    return PinView;
+    return v;
 })

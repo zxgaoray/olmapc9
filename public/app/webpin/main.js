@@ -17,12 +17,11 @@ require(
     'jquery'
     ,'underscore'
     ,'backbone'
-    ,'app/webpin/view/PinView'
+    ,'app/webpin/App'
     ,'bootstrap'
     
     
 ],
-function($, _, Backbone, PinView){
-    var pinView = new PinView();
-    pinView.fetchData();
+function($, _, Backbone, App){
+    App.initialize();
 })
