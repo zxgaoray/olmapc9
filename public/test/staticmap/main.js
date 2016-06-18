@@ -16,7 +16,7 @@ require(
 	,'underscore'
 	,'backbone'
 ],
-function($, _, Backbone, nicescroll){
+function($, _, Backbone){
     $('body').bind('contextmenu',function(){
         return false;
     });
@@ -78,6 +78,33 @@ function($, _, Backbone, nicescroll){
 	var pinLayer = new OpenLayers.Layer.Markers('pin');
 	map.addLayer(pinLayer);
 	
+	var style = new OpenLayers.Style({
+	    pointRadius:'${radius}',
+	    fillColor:'#44aa44',
+	    fillOpacity:0.8
+	}, {
+	    context:{
+	        radius:function(feature){
+	            var pix = 2;
+	            if (feature.cluster) {
+	                pix = Math.min(feature.attributes.count, 8) + 2;
+	            }
+	            return pix;
+	        }
+	    }
+	})
+	var clusterLayer = new OpenLayers.Layer.Vector('cluster', {
+	    strategies:[
+	        new OpenLayers.Strategy.Cluster({
+	            distance:100
+	        })
+	        ],
+	    styleMap:new OpenLayers.StyleMap({
+	        'default':style
+	    })
+	});
+	map.addLayer(clusterLayer);
+	
 	function createMarkers() {
 	    for (var i=0; i < 10; i++) {
     	    var item = {
@@ -137,7 +164,23 @@ function($, _, Backbone, nicescroll){
     })
     
     
-    
     createMarkers();
+    
+    $.ajax({
+        url:'/test/clusterPoints',
+        success:function(json){
+            var features = [];
+            for (var i=0; i < json.length; i++) {
+                var item = json[i];
+                var lonlat = new OpenLayers.LonLat(item.lon, item.lat).transform(new OpenLayers.Projection("EPSG:4326"),map.getProjectionObject());
+                var geometry = new OpenLayers.Geometry.Point(lonlat.lon, lonlat.lat);
+                var attrs = item;
+                var feature = new OpenLayers.Feature.Vector(geometry, attrs);
+                
+                features.push(feature);
+            }
+            clusterLayer.addFeatures(features);
+        }
+    })
     
 })

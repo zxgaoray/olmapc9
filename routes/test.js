@@ -1,6 +1,8 @@
 var express = require('express');
 var router = express.Router();
 
+var modifyCtlr = require('../controller/test/staticmap/modify_controller');
+
 /* GET home page. */
 router.get('/', function(req, res, next) {
   res.render('index', { title: 'Express' });
@@ -29,5 +31,10 @@ router.get('/staticmap', function(req, res, next) {
 router.get('/ags3d', function(req, res, next) {
     res.render('test/ags3d/index');
 })
+
+
+/*static map */
+
+router.get('/clusterPoints', modifyCtlr.clusterPoints);
 
 module.exports = router;
