@@ -123,7 +123,7 @@ function($, _, Backbone, AnimatedClusterStrategy){
     
     var iconRule = new OpenLayers.Rule({
         filter : new OpenLayers.Filter.Comparison({
-            type:OpenLayers.Filter.Comparison.LESS_THAM,
+            type:OpenLayers.Filter.Comparison.LESS_THAN,
             property : "count",
             value : 2
         }),
@@ -137,13 +137,13 @@ function($, _, Backbone, AnimatedClusterStrategy){
             ,labelOutlineWidth : 1
             ,fontColor : '#3333ff'
             ,fontSize : '12px'
-            ,externalGraphic : 'http://www.openlayers.org/dev/img/marker.png'
+            ,externalGraphic : 'https://cdn.bootcss.com/openlayers/2.13.1/img/marker.png'
         }
     });
     
     var lowRule = new OpenLayers.Rule({
         filter : new OpenLayers.Filter.Comparison({
-            type : OpenLayers.Filter.Comparison.LESS_THAM
+            type : OpenLayers.Filter.Comparison.LESS_THAN
             ,property : "count"
             ,value : "15"
         })
