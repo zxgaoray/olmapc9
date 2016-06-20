@@ -3,7 +3,7 @@ require.config({
 		'jquery':'https://cdn.bootcss.com/jquery/1.12.4/jquery.min'
 		,'underscore':'https://cdn.bootcss.com/underscore.js/1.8.3/underscore-min'
 		,'backbone':'https://cdn.bootcss.com/backbone.js/1.3.3/backbone-min'
-		
+		,'test':'/test'
 	},
 	shim:{
 		'backbone':['underscore']
@@ -15,8 +15,9 @@ require(
 	'jquery'
 	,'underscore'
 	,'backbone'
+	,'test/staticmap/util/AnimatedClusterStrategy'
 ],
-function($, _, Backbone){
+function($, _, Backbone, AnimatedClusterStrategy){
     $('body').bind('contextmenu',function(){
         return false;
     });
@@ -79,9 +80,12 @@ function($, _, Backbone){
 	map.addLayer(pinLayer);
 	
 	var style = new OpenLayers.Style({
-	    pointRadius:'${radius}',
-	    fillColor:'#44aa44',
-	    fillOpacity:0.8
+	    pointRadius:'${radius}'
+	    ,fillColor:'#44aa44'
+	    ,fillOpacity:0.8
+	    ,fontColor : '#ffffff'
+	    ,fontSize : '12px'
+	    ,label : '${count}'
 	}, {
 	    context:{
 	        radius:function(feature){
@@ -95,15 +99,134 @@ function($, _, Backbone){
 	})
 	var clusterLayer = new OpenLayers.Layer.Vector('cluster', {
 	    strategies:[
+	        
 	        new OpenLayers.Strategy.Cluster({
 	            distance:100
 	        })
+	        /*
+	        new AnimatedClusterStrategy({
+	            distance:100
+	        })*/
 	        ],
 	    styleMap:new OpenLayers.StyleMap({
 	        'default':style
 	    })
 	});
 	map.addLayer(clusterLayer);
+	
+	
+    var colors = {
+        low : 'rgb(181, 226, 140)',
+        middle : 'rgb(241, 211, 87)',
+        high : 'rgb(253, 156, 115)'
+    }
+    
+    var iconRule = new OpenLayers.Rule({
+        filter : new OpenLayers.Filter.Comparison({
+            type:OpenLayers.Filter.Comparison.LESS_THAM,
+            property : "count",
+            value : 2
+        }),
+        symbolizer : {
+            fillColor : colors.low
+            ,fillOpacity : 0.9
+            ,strokeColor : colors.low
+            ,strokeOpacity : 0.5
+            ,strokeWidth : 12
+            ,pointRadius : 10
+            ,labelOutlineWidth : 1
+            ,fontColor : '#3333ff'
+            ,fontSize : '12px'
+            ,externalGraphic : 'http://www.openlayers.org/dev/img/marker.png'
+        }
+    });
+    
+    var lowRule = new OpenLayers.Rule({
+        filter : new OpenLayers.Filter.Comparison({
+            type : OpenLayers.Filter.Comparison.LESS_THAM
+            ,property : "count"
+            ,value : "15"
+        })
+        ,symbolizer : {
+            fillColor : colors.low
+            ,fillOpacity : 0.9
+            ,strokeColor : colors.low
+            ,strokeOpacity : 0.5
+            ,strokeWidth : 12
+            ,pointRadius : 10
+            ,label : "${count}"
+            ,labelOutlineWidth : 1
+            ,fontColor : "#ffffff"
+            ,fontOpacity : 0.8
+            ,fontSize : "12px"
+        }
+    });
+    
+    var middleRule = new OpenLayers.Rule({
+        filter : new OpenLayers.Filter.Comparison({
+            type : OpenLayers.Filter.Comparison.BETWEEN
+            ,property : "count"
+            ,lowerBoundary : 15
+            ,upperBoundary : 50
+        })
+        ,symbolizer : {
+            fillColor : colors.middle
+            ,fillOpacity : 0.9
+            ,strokeColor : colors.middle
+            ,strokeOpacity : 0.5
+            ,strokeWidth : 12
+            ,pointRadius : 15
+            ,label : "${count}"
+            ,labelOutlineWidth : 1
+            ,fontColor : '#ffffff'
+            ,fontOpacity : 0.8
+            ,fontSize : "12px"
+        }
+    })
+    
+    var highRule = new OpenLayers.Rule({
+        filter : new OpenLayers.Filter.Comparison({
+            type : OpenLayers.Filter.Comparison.GREATER_THAN
+            ,property : "count"
+            ,value : 50
+        })
+        ,symbolizer : {
+            fillColor : colors.high
+            ,fillOpacity : 0.9
+            ,strokeColor : colors.high
+            ,strokeOpacity : 0.5
+            ,strokeWidth : 12
+            ,pointRadius : 20
+            ,label : "${count}"
+            ,labelOutlineWidth : 1
+            ,fontColor : "#ffffff"
+            ,fontOpacity : 0.8
+            ,fontSize : "12px"
+        }
+    })
+    
+    var aclStyle = new OpenLayers.Style(null, {
+        rules : [lowRule, middleRule, highRule, iconRule]
+    });
+    
+	var animatedClusterLayer = new OpenLayers.Layer.Vector('animated-cluster', {
+	    strategies : [
+	        new AnimatedClusterStrategy({
+	            distance : 45
+	            ,animationMethod : OpenLayers.Easing.Expo.easeOut
+	            ,animationDuration : 20
+	        })
+	        ]
+        ,styleMap : new OpenLayers.StyleMap({
+            "default" : aclStyle
+            ,"select" : {
+                fillColor : '#8aeeef'
+                ,strokeColor : '#32a8a9'
+            }
+        })
+	})
+	
+	map.addLayer(animatedClusterLayer);
 	
 	function createMarkers() {
 	    for (var i=0; i < 10; i++) {
@@ -167,7 +290,7 @@ function($, _, Backbone){
     createMarkers();
     
     $.ajax({
-        url:'/test/clusterPoints',
+        url:'/test/clusterPoints?offset=0.002',
         success:function(json){
             var features = [];
             for (var i=0; i < json.length; i++) {
@@ -180,6 +303,23 @@ function($, _, Backbone){
                 features.push(feature);
             }
             clusterLayer.addFeatures(features);
+        }
+    })
+    
+    $.ajax({
+        url : '/test/animatedClusterPoints?offset=0.002'
+        ,success : function(json){
+            var features = [];
+            for (var i=0; i < json.length; i++) {
+                var item = json[i];
+                var lonlat = new OpenLayers.LonLat(item.lon, item.lat).transform(new OpenLayers.Projection("EPSG:4326"),map.getProjectionObject());
+                var geometry = new OpenLayers.Geometry.Point(lonlat.lon, lonlat.lat);
+                var attrs = item;
+                var feature = new OpenLayers.Feature.Vector(geometry, attrs);
+                
+                features.push(feature);
+            }
+            animatedClusterLayer.addFeatures(features);
         }
     })
     

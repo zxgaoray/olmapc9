@@ -36,5 +36,6 @@ router.get('/ags3d', function(req, res, next) {
 /*static map */
 
 router.get('/clusterPoints', modifyCtlr.clusterPoints);
+router.get('/animatedClusterPoints', modifyCtlr.animatedClusterPoints);
 
 module.exports = router;
