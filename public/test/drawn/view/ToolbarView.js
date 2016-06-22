@@ -66,23 +66,32 @@ function($, _, Backbone, tmpl, CircleHandler, SectorHandler){
 			});
         }
         , _drawEnd : function(e) {
-            this.drawTool.circle.deactivate();
-            this.drawTool.sector.deactivate();
+            
         }
         , _drawToolBtn_clickHandler : function(e) {
             var data = $(e.currentTarget).attr('data');
             switch (data) {
                 case 'select-by-circle':
                     // code
-                    this.drawTools.circle.activate();
+                    this._beginDraw('circle');
                     break;
                 case 'select-by-sector':
-                    this.drawTools.sector.activate();
+                    this._beginDraw('sector');
                     break;
                 default:
                     // code
             }
             
+        }
+        , _beginDraw : function(value) {
+            for (key in this.drawTools) {
+                var control = this.drawTools[key];
+                if (value == key) {
+                    control.activate();
+                } else {
+                    control.deactivate();
+                }
+            }
         }
     });
     

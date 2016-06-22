@@ -45,7 +45,6 @@ function(GeoPlot){
                 
                 var points = this.calculateArc(centerPoint, radius, angleR, angleC, this.direction);
                 points.unshift(centerPoint);
-                console.log(points);
                 this.components.push(new OpenLayers.Geometry.LinearRing(points));
             }
         }
