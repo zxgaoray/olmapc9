@@ -32,6 +32,10 @@ router.get('/ags3d', function(req, res, next) {
     res.render('test/ags3d/index');
 })
 
+router.get('/drawn', function(req, res, next) {
+    res.render('test/drawn/index');
+})
+
 
 /*static map */
 

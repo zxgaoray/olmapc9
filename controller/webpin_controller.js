@@ -53,6 +53,14 @@ function webpinList() {
                 denpences:'requirejs backbone arcgis_js_api',
                 descript:'',
                 img:'http://www.easyicon.net/api/resizeApi.php?id=1195280&size=128'
+            },
+            {
+                code:'webpin7',
+                name:'drawn',
+                pin:'/test/drawn',
+                denpences:'requirejs backbone openlayers2',
+                descript:'',
+                img:'http://www.easyicon.net/api/resizeApi.php?id=1195280&size=128'
             }
         ]
     }

@@ -1,0 +1,10 @@
+.map-container {
+    height: 100%;
+    position: relative;
+}
+
+.toolbar-container {
+    position: absolute;
+    top:20px;
+    right:20px;
+}

@@ -1,17 +1,18 @@
-define('test/staticmap/view/ToolbarView',
+define('test/drawn/view/ToolbarView',
 [
     'jquery'
     ,'underscore'
     ,'backbone'
-    ,'text!test/staticmap/template/ToolbarView.ejs'
+    ,'text!test/drawn/template/ToolbarView.ejs'
     
-    , 'test/staticmap/util/PlotHandler'
-    , 'test/staticmap/util/GeoCircle'
+    , 'test/drawn/util/plot/handler/CircleHandler'
+    , 'test/drawn/util/plot/handler/SectorHandler'
 ],
-function($, _, Backbone, tmpl, PlotHandler, GeoCircle){
+function($, _, Backbone, tmpl, CircleHandler, SectorHandler){
     var Clz = Backbone.View.extend({
         el : '#toolbardiv',
         initialize : function(opt){
+            var self = this;
             this.options = {
                 
             };
@@ -31,11 +32,16 @@ function($, _, Backbone, tmpl, PlotHandler, GeoCircle){
             this.layer = new OpenLayers.Layer.Vector('draw-layer');
             this.map.addLayer(this.layer);
             
-            this.drawTool = new OpenLayers.Control.DrawFeature(this.layer, PlotHandler, {
-                
-            });
-            this.map.addControl(this.drawTool);
-            this.drawTool.events.register('featureadded', this._drawEnd, this);
+            
+            this.drawTools = {
+                circle : new OpenLayers.Control.DrawFeature(this.layer, CircleHandler, {})
+                , sector : new OpenLayers.Control.DrawFeature(this.layer, SectorHandler, {})
+            };
+            
+            _.each(this.drawTools, function(control) {
+                self.map.addControl(control);
+                control.events.register('featureadded', self._drawEnd, self);
+            })
             
             this.render();
         }
@@ -60,14 +66,23 @@ function($, _, Backbone, tmpl, PlotHandler, GeoCircle){
 			});
         }
         , _drawEnd : function(e) {
-            console.log(e);
-            
-            this.drawTool.deactivate();
+            this.drawTool.circle.deactivate();
+            this.drawTool.sector.deactivate();
         }
         , _drawToolBtn_clickHandler : function(e) {
             var data = $(e.currentTarget).attr('data');
-            console.log(data);
-            this.drawTool.activate();
+            switch (data) {
+                case 'select-by-circle':
+                    // code
+                    this.drawTools.circle.activate();
+                    break;
+                case 'select-by-sector':
+                    this.drawTools.sector.activate();
+                    break;
+                default:
+                    // code
+            }
+            
         }
     });
     
