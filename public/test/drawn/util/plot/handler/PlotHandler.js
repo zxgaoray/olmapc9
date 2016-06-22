@@ -5,11 +5,14 @@ define('test/drawn/util/plot/handler/PlotHandler',
 function(_){
     var Plot = OpenLayers.Class(OpenLayers.Handler, {
         controlPoints : []
+        , plotting : null
         , isDrawing : false
+        , layerOptions : null
         , layerOptions : null
         , pixelTolerance : 5
         , point : null
         , layer : null
+        , multi : false
         , mouseDown : false
         , stoppedDown : null
         , lastDown : null
@@ -18,20 +21,36 @@ function(_){
         , stopDown : false
         , stopUp : false
         , touch : false
-        
+        , lastTouchPx : null
+        , CLASS_NAME : 'PlotHandler'
         , initialize : function(control, callbacks, options) {
+            if (!(options && options.layerOptions && options.layerOptions.styleMap)) {
+                if (!this.style) {
+                    this.style = OpenLayers.Util.extend(OpenLayers.Feature.Vector.style['default'], {});
+                }
+            }
             
             OpenLayers.Handler.prototype.initialize.apply(this, arguments);
-            this.layer = this.control.layer;
+            
+            //this.layer = this.control.layer;
         }
         , activate : function() {
             if (! OpenLayers.Handler.prototype.activate.apply(this, arguments)) {
                 return false;
             }
-            console.log('activate');
+            
             this.controlPoints = [];
             this.plotting = null;
             this.isDrawing = false;
+            
+            var options = OpenLayers.Util.extend({
+                displayInLayerSwitcher : false
+                , calculateInRange :OpenLayers.Function.True
+            }, this.layerOptions);
+            
+            this.layer = new OpenLayers.Layer.Vector(this.CLASS_NAME, options);
+            //this.layer = new OpenLayers.Layer.Vector();
+            this.map.addLayer(this.layer);
             
             return true;
         }
@@ -43,6 +62,17 @@ function(_){
             this.controlPoints = [];
             this.plotting = null;
             this.isDrawing = false;
+            
+            this.cancel();
+            
+            if (this.layer.map != null) {
+                
+                this.destroyFeature(true);
+                this.layer.destroy(false);
+            }
+            
+            this.layer = null;
+            this.touch = false;
             
             return true;
         }
@@ -125,7 +155,7 @@ function(_){
             }
         }
         , finalize : function(cancel) {
-            var key = cancel ? "cancal" : "done";console.log(key);
+            var key = cancel ? "cancal" : "done";
             this.mouseDown = false;
             this.lastDown = null;
             this.lastUp = null;
@@ -159,7 +189,10 @@ function(_){
             return this.up(evt);
         }
         , mouseout : function(evt) {
-            
+            if (OpenLayers.Util.mouseLeft(evt, this.map.eventsDiv)) {
+                this.stoppedDown = this.stopDown;
+                this.mouseDown = false;
+            }
         }
         , passesTolerance : function(pixel1, pixel2, tolerance) {
             var passes = true;
@@ -187,7 +220,7 @@ function(_){
             this.controlPoints = [];
             
             if (this.active == true) {
-                
+                //this.layer.removeAllFeatures();
             }
         }
     })
