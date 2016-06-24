@@ -61,8 +61,8 @@ function(){
                     y_2 = Math.sqrt(d*d-x_1*x_1);
                     y_1 = -y_2;
                 }
-                v_l = new SuperMap.Geometry.Point(x_1,y_1);
-                v_r = new SuperMap.Geometry.Point(x_2,y_2);
+                v_l = new OpenLayers.Geometry.Point(x_1,y_1);
+                v_r = new OpenLayers.Geometry.Point(x_2,y_2);
             }
             //此为大多数情况
             else
@@ -85,21 +85,86 @@ function(){
                 //当向量向上时
                 if(v.y>=0)
                 {
-                    v_l = new SuperMap.Geometry.Point(x_1,y_1);
-                    v_r = new SuperMap.Geometry.Point(x_2,y_2);
+                    v_l = new OpenLayers.Geometry.Point(x_1,y_1);
+                    v_r = new OpenLayers.Geometry.Point(x_2,y_2);
                 }
                 //当向量向下时
                 else if(v.y<0)
                 {
-                    v_l = new SuperMap.Geometry.Point(x_2,y_2);
-                    v_r = new SuperMap.Geometry.Point(x_1,y_1);
+                    v_l = new OpenLayers.Geometry.Point(x_2,y_2);
+                    v_r = new OpenLayers.Geometry.Point(x_1,y_1);
                 }
             }
             return [v_l,v_r];
         }
-        , calculateIntersection : function() {}
-        , calculateAngularBisector : function() {}
-        , calculateIntersectionFromTwoCorner : function() {}
+        , calculateIntersection : function() {
+            //定义交点的坐标
+            var x;
+            var y;
+            //如果向量v_1和v_2平行
+            if(v_1.y*v_2.x-v_1.x*v_2.y == 0)
+            {
+                //平行也有两种情况
+                //同向
+                if(v_1.x*v_2.x>0 || v_1.y*v_2.y>0)
+                {
+                    //同向直接取两个点的中点
+                    x = (point1.x+point2.x)/2;
+                    y = (point1.y+point2.y)/2;
+                }
+                //反向
+                else
+                {
+                    //如果反向直接返回后面的点位置
+                    x = point2.x;
+                    y = point2.y;
+                }
+            }
+            else
+            {
+                //
+                x = (v_1.x*v_2.x*(point2.y-point1.y)+point1.x*v_1.y*v_2.x-point2.x*v_2.y*v_1.x)/(v_1.y*v_2.x-v_1.x*v_2.y);
+                if(v_1.x!=0)
+                {
+                    y = (x-point1.x)*v_1.y/v_1.x+point1.y;
+                }
+                //不可能v_1.x和v_2.x同时为0
+                else
+                {
+                    y = (x-point2.x)*v_2.y/v_2.x+point2.y;
+                }
+            }
+            return new OpenLayers.Geometry.Point(x,y);
+        }
+        , calculateAngularBisector : function(v1, v2) {
+            //计算角平分线的思想是取两个向量的单位向量，然后相加
+            var d1 = Math.sqrt(v1.x*v1.x+v1.y*v1.y);
+            var d2 = Math.sqrt(v2.x*v2.x+v2.y*v2.y);
+            return new OpenLayers.Geometry.Point(v1.x/d1+v2.x/d2,v1.y/d1+v2.y/d2);
+        }
+        , calculateIntersectionFromTwoCorner : function(pointS, pointE, a_S, a_E) {
+            if(!a_S) a_S = Math.PI/4;
+            if(!a_E) a_E = Math.PI/4;
+
+            //起始点、结束点、交点加起来三个点，形成一个三角形
+            //斜边（起始点到结束点）的向量为
+            var v_SE = new OpenLayers.Geometry.Point(pointE.x-pointS.x,pointE.y-pointS.y);
+            //计算起始点、交点的单位向量
+            var v_SI_lr = this.calculateVector(v_SE,a_S,1);
+            //获取
+            var v_SI_l = v_SI_lr[0];
+            var v_SI_r = v_SI_lr[1];
+            //计算结束点、交点的单位向量
+            var v_EI_lr = this.calculateVector(v_SE,Math.PI-a_S,1);
+            //获取
+            var v_EI_l = v_EI_lr[0];
+            var v_EI_r = v_EI_lr[1];
+            //求左边的交点
+            var pointI_l = this.calculateIntersection(v_SI_l,v_EI_l,pointS,pointE);
+            //计算右边的交点
+            var pointI_r = this.calculateIntersection(v_SI_r,v_EI_r,pointS,pointE);
+            return [pointI_l,pointI_r];
+        }
         , calculateDistance : function(pointA, pointB){
             var distance =Math.sqrt(Math.pow(pointA.x - pointB.x, 2) + Math.pow(pointA.y - pointB.y, 2));
             return distance;
