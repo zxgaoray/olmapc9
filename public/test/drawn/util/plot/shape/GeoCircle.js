@@ -7,6 +7,16 @@ function(GeoPlot){
         initialize : function() {
             GeoPlot.prototype.initialize.apply(this, arguments);
         }
+        , clone : function() {
+            var geoCircle = new Circle();
+            var controlPoints = [];
+            for(var i = 0, len = this._controlPoints.length; i<len; i++)
+            {
+                controlPoints.push(this._controlPoints[i].clone());
+            }
+            geoCircle._controlPoints = controlPoints;
+            return geoCircle;
+        }
         , calculateParts : function() {
             this.components = [];
             

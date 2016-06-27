@@ -8,6 +8,16 @@ function(GeoPlot){
         , initialize : function() {
             GeoPlot.prototype.initialize.apply(this, arguments);
         }
+        , clone : function() {
+            var geoSector = new GeoSector();
+            var controlPoints = [];
+            for(var i = 0, len = this._controlPoints.length; i<len; i++)
+            {
+                controlPoints.push(this._controlPoints[i].clone());
+            }
+            geoSector._controlPoints = controlPoints;
+            return geoSector;
+        }
         , calculateParts : function() {
             var controlPoints = this.cloneControlPoints(this._controlPoints);
             

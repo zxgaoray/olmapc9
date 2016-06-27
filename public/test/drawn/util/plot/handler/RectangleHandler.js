@@ -1,44 +1,40 @@
-define('test/drawn/util/plot/handler/CircleHandler',
+define('test/drawn/util/plot/handler/RectangleHandler',
 [
-    'test/drawn/util/plot/handler/PlotHandler',
-    'test/drawn/util/plot/shape/GeoCircle'
+    'test/drawn/util/plot/handler/PlotHandler'
+    , 'test/drawn/util/plot/shape/GeoRectangle'
 ],
-function(PlotHandler, GeoCircle){
-    var CircleHandler = OpenLayers.Class(PlotHandler, {
-        initialize : function(control, callbacks, options) {
+function(PlotHandler, GeoRectangle){
+    var RectangleHandler = OpenLayers.Class(PlotHandler, {
+        initialize : function(control, callback, options) {
             PlotHandler.prototype.initialize.apply(this, arguments);
         }
         , createFeature : function(pixel) {
             var lonlat = this.layer.getLonLatFromViewPortPx(pixel);
-            var geometry = new OpenLayers.Geometry.Point(
-                lonlat.lon, lonlat.lat
-            );
+            var geometry = new OpenLayers.Geometry.Point(lonlat.lon, lonlat.lat);
             this.point = new OpenLayers.Feature.Vector(geometry);
-    
-            //标绘扩展符号的 Geometry 类型为 GeoCircle
-            this.plotting = new OpenLayers.Feature.Vector(
-                new GeoCircle()
-            );
-    
+            
+            this.plotting = new OpenLayers.Feature.Vector(new GeoRectangle());
+            
             this.callback("create", [this.point.geometry, this.getSketch()]);
+            
             this.point.geometry.clearBounds();
-        }
-        , destroyPersistedFeature : function() {
-            var layer = this.layer;
-            if (layer && layer.features.length > 1) {
-                this.layer.features[0].destroy();
-            }
         }
         , up : function(evt) {
             this.mouseDown = false;
             this.stoppedDown = this.stopDown;
             
+            if (this.lastUp && this.lastUp.equals(evt.xy)) {
+                return true;
+            }
+            
             if (this.lastDown && this.passesTolerance(this.lastDown, evt.xy, this.pixelTolerance)) {
-                this.lastUp = evt.xy;
+                if (this.touch) {};
                 
-                if (this.persist) {
+                if (this.presist) {
                     this.destroyPersistedFeature();
                 }
+                
+                this.lastUp = evt.xy;
                 
                 this.addControlPoint(evt.xy);
                 
@@ -46,19 +42,22 @@ function(PlotHandler, GeoCircle){
                 
                 if (len == 1) {
                     this.isDrawing = true;
-                } else if (len == 2) {
-                    this.drawComplete();
-                } else {
                     
+                } else if (len == 2) {
+                    this.drawComplete()   
+                } else {
+                    this.isDrawing = false;
+                    this.controlPoints = [];
+                    this.plotting = null;
                 }
                 
                 return true;
-                
             } else {
                 return true;
             }
+            
         }
     })
     
-    return CircleHandler;
+    return RectangleHandler;
 })

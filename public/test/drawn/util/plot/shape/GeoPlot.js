@@ -15,7 +15,7 @@ function(){
         , getControlPoints : function() {
             return this._controlPoints;
         }
-        , setControlPoints : function() {
+        , setControlPoint : function(points) {
             if(points && points.length && points.length > 0){
                 this._controlPoints = points;
                 this.calculateParts();
@@ -196,7 +196,7 @@ function(){
             return controlPoints;
         }
         , clone: function(){
-            var geoState = new GeoPlotting();
+            var geoState = new GeoPlot();
             var controlPoints = [];
             //赋值控制点
             for(var i = 0, len = this._controlPoints.length; i<len; i++)

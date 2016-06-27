@@ -17,7 +17,7 @@ function(_){
         , stoppedDown : null
         , lastDown : null
         , lastUp : null
-        , presist : false
+        , persist : false
         , stopDown : false
         , stopUp : false
         , touch : false
@@ -45,7 +45,7 @@ function(_){
             
             var options = OpenLayers.Util.extend({
                 displayInLayerSwitcher : false
-                , calculateInRange :OpenLayers.Function.True
+                , calculateInRange : OpenLayers.Function.True
             }, this.layerOptions);
             
             this.layer = new OpenLayers.Layer.Vector(this.CLASS_NAME, options);
@@ -98,7 +98,7 @@ function(_){
                 this.plotting.geometry.calculateParts();
             }
             
-            //this.callback("modify", [this.point.geometry, this.getSketch(), false]);
+            this.callback("modify", [this.point.geometry, this.getSketch(), false]);
             
             this.point.geometry.clearBounds();
             this.drawFeature();
@@ -155,12 +155,12 @@ function(_){
             }
         }
         , finalize : function(cancel) {
-            var key = cancel ? "cancal" : "done";
+            var key = cancel ? "cancel" : "done";
             this.mouseDown = false;
             this.lastDown = null;
             this.lastUp = null;
             this.lastTouchPx = null;
-            //this.callback(key, [this.geometryClone()]);
+            this.callback(key, [this.geometryClone()]);
             this.destroyFeature(cancel);
         }
         , cancel : function() {
@@ -220,7 +220,7 @@ function(_){
             this.controlPoints = [];
             
             if (this.active == true) {
-                //this.layer.removeAllFeatures();
+                this.layer.removeAllFeatures();
             }
         }
     })

@@ -7,8 +7,9 @@ define('test/drawn/view/ToolbarView',
     
     , 'test/drawn/util/plot/handler/CircleHandler'
     , 'test/drawn/util/plot/handler/SectorHandler'
+    , 'test/drawn/util/plot/handler/RectangleHandler'
 ],
-function($, _, Backbone, tmpl, CircleHandler, SectorHandler){
+function($, _, Backbone, tmpl, CircleHandler, SectorHandler, RectangleHandler){
     var Clz = Backbone.View.extend({
         el : '#toolbardiv',
         initialize : function(opt){
@@ -29,18 +30,28 @@ function($, _, Backbone, tmpl, CircleHandler, SectorHandler){
                 'click drawToolBtn' : '_drawToolBtn_clickHandler'
             }
             
-            this.layer = new OpenLayers.Layer.Vector('draw-layer');
-            this.map.addLayer(this.layer);
+            this.plottingLayer = new OpenLayers.Layer.Vector('draw-layer');
+            this.map.addLayer(this.plottingLayer);
+            
+            this.plottingLayer.style = {
+                fillColor: "#66cccc",
+                fillOpacity: 0.4,
+                strokeColor: "#66cccc",
+                strokeOpacity: 1,
+                strokeWidth: 3,
+                pointRadius:6
+            };
             
             
             this.drawTools = {
-                circle : new OpenLayers.Control.DrawFeature(this.layer, CircleHandler, {})
-                , sector : new OpenLayers.Control.DrawFeature(this.layer, SectorHandler, {})
+                circle : new OpenLayers.Control.DrawFeature(this.plottingLayer, CircleHandler, {})
+                , sector : new OpenLayers.Control.DrawFeature(this.plottingLayer, SectorHandler, {})
+                , rectangle : new OpenLayers.Control.DrawFeature(this.plottingLayer, RectangleHandler, {})
             };
             
             _.each(this.drawTools, function(control) {
                 self.map.addControl(control);
-                control.events.register('featureadded', self._drawEnd, self);
+                control.events.on({'featureadded':self._drawEnd})
             })
             
             this.render();
@@ -66,7 +77,10 @@ function($, _, Backbone, tmpl, CircleHandler, SectorHandler){
 			});
         }
         , _drawEnd : function(e) {
-            
+            for (key in this.drawTools) {
+                var control = this.drawTools[key];
+                control.deactivate();
+            }
         }
         , _drawToolBtn_clickHandler : function(e) {
             var data = $(e.currentTarget).attr('data');
@@ -78,8 +92,12 @@ function($, _, Backbone, tmpl, CircleHandler, SectorHandler){
                 case 'select-by-sector':
                     this._beginDraw('sector');
                     break;
+                case 'select-by-rect':
+                    this._beginDraw('rectangle');
+                    break;
                 default:
                     // code
+                    break;
             }
             
         }
