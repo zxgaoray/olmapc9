@@ -55,7 +55,7 @@ function(_){
             return true;
         }
         , deactivate : function() {
-            if (OpenLayers.Handler.prototype.deactivate.apply(this, arguments)) {
+            if (!OpenLayers.Handler.prototype.deactivate.apply(this, arguments)) {
                 return false;
             }
             

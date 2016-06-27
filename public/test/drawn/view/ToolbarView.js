@@ -51,7 +51,7 @@ function($, _, Backbone, tmpl, CircleHandler, SectorHandler, RectangleHandler){
             
             _.each(this.drawTools, function(control) {
                 self.map.addControl(control);
-                control.events.on({'featureadded':self._drawEnd})
+                control.events.register('featureadded', self, self._drawEnd);
             })
             
             this.render();
@@ -77,10 +77,8 @@ function($, _, Backbone, tmpl, CircleHandler, SectorHandler, RectangleHandler){
 			});
         }
         , _drawEnd : function(e) {
-            for (key in this.drawTools) {
-                var control = this.drawTools[key];
-                control.deactivate();
-            }
+            
+            this._deactiveDraw();
         }
         , _drawToolBtn_clickHandler : function(e) {
             var data = $(e.currentTarget).attr('data');
@@ -94,6 +92,9 @@ function($, _, Backbone, tmpl, CircleHandler, SectorHandler, RectangleHandler){
                     break;
                 case 'select-by-rect':
                     this._beginDraw('rectangle');
+                    break;
+                case 'select-by-nope':
+                    this._deactiveDraw();
                     break;
                 default:
                     // code
@@ -109,6 +110,12 @@ function($, _, Backbone, tmpl, CircleHandler, SectorHandler, RectangleHandler){
                 } else {
                     control.deactivate();
                 }
+            }
+        }
+        , _deactiveDraw : function() {
+            for (key in this.drawTools) {
+                var control = this.drawTools[key];
+                control.deactivate();
             }
         }
     });
