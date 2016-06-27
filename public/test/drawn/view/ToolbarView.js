@@ -8,8 +8,9 @@ define('test/drawn/view/ToolbarView',
     , 'test/drawn/util/plot/handler/CircleHandler'
     , 'test/drawn/util/plot/handler/SectorHandler'
     , 'test/drawn/util/plot/handler/RectangleHandler'
+    , 'test/drawn/util/plot/handler/ArcHandler'
 ],
-function($, _, Backbone, tmpl, CircleHandler, SectorHandler, RectangleHandler){
+function($, _, Backbone, tmpl, CircleHandler, SectorHandler, RectangleHandler, ArcHandler){
     var Clz = Backbone.View.extend({
         el : '#toolbardiv',
         initialize : function(opt){
@@ -47,6 +48,7 @@ function($, _, Backbone, tmpl, CircleHandler, SectorHandler, RectangleHandler){
                 circle : new OpenLayers.Control.DrawFeature(this.plottingLayer, CircleHandler, {})
                 , sector : new OpenLayers.Control.DrawFeature(this.plottingLayer, SectorHandler, {})
                 , rectangle : new OpenLayers.Control.DrawFeature(this.plottingLayer, RectangleHandler, {})
+                , arc : new OpenLayers.Control.DrawFeature(this.plottingLayer, ArcHandler, {})
             };
             
             _.each(this.drawTools, function(control) {
@@ -93,9 +95,13 @@ function($, _, Backbone, tmpl, CircleHandler, SectorHandler, RectangleHandler){
                 case 'select-by-rect':
                     this._beginDraw('rectangle');
                     break;
+                case 'select-by-arc' :
+                    this._beginDraw('arc');
+                    break;
                 case 'select-by-nope':
                     this._deactiveDraw();
                     break;
+                    
                 default:
                     // code
                     break;
