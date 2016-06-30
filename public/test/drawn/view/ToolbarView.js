@@ -9,8 +9,9 @@ define('test/drawn/view/ToolbarView',
     , 'test/drawn/util/plot/handler/SectorHandler'
     , 'test/drawn/util/plot/handler/RectangleHandler'
     , 'test/drawn/util/plot/handler/ArcHandler'
+    , 'test/drawn/util/plot/handler/BezierCurve2Handler'
 ],
-function($, _, Backbone, tmpl, CircleHandler, SectorHandler, RectangleHandler, ArcHandler){
+function($, _, Backbone, tmpl, CircleHandler, SectorHandler, RectangleHandler, ArcHandler, BezierCurve2Handler){
     var Clz = Backbone.View.extend({
         el : '#toolbardiv',
         initialize : function(opt){
@@ -49,6 +50,7 @@ function($, _, Backbone, tmpl, CircleHandler, SectorHandler, RectangleHandler, A
                 , sector : new OpenLayers.Control.DrawFeature(this.plottingLayer, SectorHandler, {})
                 , rectangle : new OpenLayers.Control.DrawFeature(this.plottingLayer, RectangleHandler, {})
                 , arc : new OpenLayers.Control.DrawFeature(this.plottingLayer, ArcHandler, {})
+                , bezier2 : new OpenLayers.Control.DrawFeature(this.plottingLayer, BezierCurve2Handler, {})
             };
             
             _.each(this.drawTools, function(control) {
@@ -97,6 +99,9 @@ function($, _, Backbone, tmpl, CircleHandler, SectorHandler, RectangleHandler, A
                     break;
                 case 'select-by-arc' :
                     this._beginDraw('arc');
+                    break;
+                case 'select-by-bezier2':
+                    this._beginDraw('bezier2');
                     break;
                 case 'select-by-nope':
                     this._deactiveDraw();

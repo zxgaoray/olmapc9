@@ -5,6 +5,7 @@ require.config({
 		,'backbone' : 'https://cdn.bootcss.com/backbone.js/1.3.3/backbone-min'
 		,'bootstrap' : 'https://cdn.bootcss.com/bootstrap/2.3.2/js/bootstrap.min'
 		, 'text' : 'https://cdn.bootcss.com/require-text/2.0.12/text.min'
+		, 'raphael' : 'https://cdnjs.cloudflare.com/ajax/libs/raphael/2.2.0/raphael.min'
 		,'test':'/test'
 	},
 	shim:{
