@@ -1,8 +1,9 @@
 define('test/drawn/util/plot/shape/GeoCircle',
 [
-    'test/drawn/util/plot/shape/GeoPlot'
+    'OpenLayers'
+    , 'test/drawn/util/plot/shape/GeoPlot'
 ],
-function(GeoPlot){
+function(OpenLayers, GeoPlot){
     var Circle = OpenLayers.Class(GeoPlot, {
         initialize : function() {
             GeoPlot.prototype.initialize.apply(this, arguments);

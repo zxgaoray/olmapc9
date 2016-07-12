@@ -1,8 +1,9 @@
 define('test/drawn/util/plot/shape/GeoRectangle',
 [
-    'test/drawn/util/plot/shape/GeoPlot'
+    'OpenLayers'
+    , 'test/drawn/util/plot/shape/GeoPlot'
 ],
-function(GeoPlot){
+function(OpenLayers, GeoPlot){
     var GeoRectangle = OpenLayers.Class(GeoPlot, {
         initialize : function() {
             GeoPlot.prototype.initialize.apply(this, arguments);

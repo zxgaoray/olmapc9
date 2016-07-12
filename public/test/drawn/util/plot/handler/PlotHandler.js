@@ -1,8 +1,9 @@
 define('test/drawn/util/plot/handler/PlotHandler',
 [
     'underscore'
+    , 'OpenLayers'
 ],
-function(_){
+function(_, OpenLayers){
     var Plot = OpenLayers.Class(OpenLayers.Handler, {
         controlPoints : []
         , plotting : null

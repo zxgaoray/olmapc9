@@ -1,9 +1,10 @@
 define('test/drawn/util/plot/handler/ArcHandler',
 [
-    'test/drawn/util/plot/handler/PlotHandler'
+    'OpenLayers'
+    , 'test/drawn/util/plot/handler/PlotHandler'
     , 'test/drawn/util/plot/shape/GeoArc'
 ],
-function(PlotHandler, GeoArc){
+function(OpenLayers, PlotHandler, GeoArc){
     var ArcHandler = OpenLayers.Class(PlotHandler, {
         initialize : function(control, callbacks, options) {
             PlotHandler.prototype.initialize.apply(this, arguments);

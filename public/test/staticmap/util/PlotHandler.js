@@ -1,9 +1,10 @@
 define('test/staticmap/util/PlotHandler',
 [
     'underscore'
+    , 'OpenLayers'
     , 'test/staticmap/util/GeoCircle'
 ],
-function(_, GeoCircle){
+function(_, OpenLayers, GeoCircle){
     var PlotHandler = OpenLayers.Class(OpenLayers.Handler, {
         controlPoints : []
         , isDrawing : false

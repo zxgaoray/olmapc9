@@ -3,9 +3,10 @@ define('test/drawn/util/raphael/ViewShed',
     'jquery'
     , 'underscore'
     , 'backbone'
+    , 'OpenLayers'
     , 'raphael'
 ],
-function($, _, Backbone, Raphael){
+function($, _, Backbone, OpenLayers, Raphael){
     var ViewShed = Backbone.View.extend({
         isGradient : false
         , initialize:function(map, layer, options){

@@ -1,9 +1,10 @@
 define('test/drawn/util/plot/handler/CircleHandler',
 [
-    'test/drawn/util/plot/handler/PlotHandler',
-    'test/drawn/util/plot/shape/GeoCircle'
+    'OpenLayers'
+    , 'test/drawn/util/plot/handler/PlotHandler'
+    , 'test/drawn/util/plot/shape/GeoCircle'
 ],
-function(PlotHandler, GeoCircle){
+function(OpenLayers, PlotHandler, GeoCircle){
     var CircleHandler = OpenLayers.Class(PlotHandler, {
         initialize : function(control, callbacks, options) {
             PlotHandler.prototype.initialize.apply(this, arguments);

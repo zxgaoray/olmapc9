@@ -1,9 +1,10 @@
 define('test/drawn/util/plot/handler/SectorHandler',
 [
-    'test/drawn/util/plot/handler/PlotHandler',
-    'test/drawn/util/plot/shape/GeoSector'
+    'OpenLayers'
+    , 'test/drawn/util/plot/handler/PlotHandler'
+    , 'test/drawn/util/plot/shape/GeoSector'
 ],
-function(PlotHandler, GeoSector){
+function(OpenLayers, PlotHandler, GeoSector){
     var SectorHandler = OpenLayers.Class(PlotHandler, {
         initialize : function(control, callbacks, options) {
             PlotHandler.prototype.initialize.apply(this, arguments);

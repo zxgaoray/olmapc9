@@ -1,7 +1,8 @@
 define('test/staticmap/util/GeoCircle',
 [
+    'OpenLayers'
 ],
-function(){
+function(OpenLayers){
     var GeoPlotting = OpenLayers.Class(OpenLayers.Geometry.Polygon, {
         _controlPoints : []
         , initialize : function(points) {

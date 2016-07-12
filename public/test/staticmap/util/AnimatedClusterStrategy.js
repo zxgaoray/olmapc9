@@ -1,7 +1,8 @@
 define('test/staticmap/util/AnimatedClusterStrategy',
 [
+    'OpenLayers'
 ],
-function(){
+function(OpenLayers){
     var Clazz = OpenLayers.Class(OpenLayers.Strategy.Cluster, {
         CLASS_NAME:'test.staticmap.util.AnimatedClusterStrategy',
         animationMethod:OpenLayers.Easing.Expo.easeOut,

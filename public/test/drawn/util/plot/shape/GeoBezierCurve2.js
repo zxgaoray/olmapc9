@@ -1,8 +1,9 @@
 define('test/drawn/util/plot/shape/GeoBezierCurve2',
 [
-    'test/drawn/util/plot/shape/GeoLinePlot'
+    'OpenLayers'
+    , 'test/drawn/util/plot/shape/GeoLinePlot'
 ],
-function(GeoLinePlot){
+function(OpenLayers, GeoLinePlot){
     if (typeof OpenLayers.Geometry.LineString.prototype.calculatePointsFBZ2 != 'function') {
         OpenLayers.Geometry.LineString.prototype.calculatePointsFBZ2 = function(controlPoints, geometry){
             return [];

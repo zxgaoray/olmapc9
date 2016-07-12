@@ -6,10 +6,14 @@ require.config({
 		,'bootstrap' : 'https://cdn.bootcss.com/bootstrap/2.3.2/js/bootstrap.min'
 		, 'text' : 'https://cdn.bootcss.com/require-text/2.0.12/text.min'
 		,'test':'/test'
+		, 'OpenLayers' : 'https://cdn.bootcss.com/openlayers/2.13.1/OpenLayers'
 	},
 	shim:{
 		'backbone' : ['underscore']
 		,'bootstrap' : ['jquery']
+		, 'OpenLayers' : {
+		    exports : 'OpenLayers'
+		}
 	}
 })
 
@@ -18,12 +22,13 @@ require(
 	'jquery'
 	,'underscore'
 	,'backbone'
+	, 'OpenLayers'
 	,'test/staticmap/util/AnimatedClusterStrategy'
 	,'test/staticmap/view/ToolbarView'
 	
 	,'bootstrap'
 ],
-function($, _, Backbone, AnimatedClusterStrategy, ToolbarView){
+function($, _, Backbone, OpenLayers, AnimatedClusterStrategy, ToolbarView){
     $('body').bind('contextmenu',function(){
         return false;
     });

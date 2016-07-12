@@ -1,9 +1,10 @@
 define('test/drawn/util/plot/handler/BezierCurve2Handler',
 [
-    'test/drawn/util/plot/handler/PlotHandler'
+    'OpenLayers'
+    , 'test/drawn/util/plot/handler/PlotHandler'
     , 'test/drawn/util/plot/shape/GeoBezierCurve2'
 ],
-function(PlotHandler, GeoBezierCurve2){
+function(OpenLayers, PlotHandler, GeoBezierCurve2){
     var BezierCurve2Handler = OpenLayers.Class(PlotHandler, {
         initialize : function(control, callbacks, options) {
             PlotHandler.prototype.initialize.apply(this, arguments);

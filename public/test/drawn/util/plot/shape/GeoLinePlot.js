@@ -1,7 +1,8 @@
 define('test/drawn/util/plot/shape/GeoLinePlot',
 [
+    'OpenLayers'
 ],
-function(){
+function(OpenLayers){
     var GeoLinePlot = OpenLayers.Class(OpenLayers.Geometry.LineString, {
         _controlPoints : []
         , initialize : function(points) {

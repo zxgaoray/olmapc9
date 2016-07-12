@@ -1,9 +1,10 @@
 define('test/drawn/util/plot/handler/RectangleHandler',
 [
-    'test/drawn/util/plot/handler/PlotHandler'
+    'OpenLayers'
+    , 'test/drawn/util/plot/handler/PlotHandler'
     , 'test/drawn/util/plot/shape/GeoRectangle'
 ],
-function(PlotHandler, GeoRectangle){
+function(OpenLayers, PlotHandler, GeoRectangle){
     var RectangleHandler = OpenLayers.Class(PlotHandler, {
         initialize : function(control, callback, options) {
             PlotHandler.prototype.initialize.apply(this, arguments);

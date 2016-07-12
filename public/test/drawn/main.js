@@ -4,6 +4,7 @@ require.config({
 		,'underscore' : 'https://cdn.bootcss.com/underscore.js/1.8.3/underscore-min'
 		,'backbone' : 'https://cdn.bootcss.com/backbone.js/1.3.3/backbone-min'
 		,'bootstrap' : 'https://cdn.bootcss.com/bootstrap/2.3.2/js/bootstrap.min'
+		, 'OpenLayers' : 'https://cdn.bootcss.com/openlayers/2.13.1/OpenLayers'
 		, 'text' : 'https://cdn.bootcss.com/require-text/2.0.12/text.min'
 		, 'raphael' : 'https://cdnjs.cloudflare.com/ajax/libs/raphael/2.2.0/raphael.min'
 		,'test':'/test'
@@ -11,6 +12,9 @@ require.config({
 	shim:{
 		'backbone' : ['underscore']
 		,'bootstrap' : ['jquery']
+		, 'OpenLayers' : {
+			exports : 'OpenLayers'
+		}
 	}
 })
 
@@ -19,11 +23,12 @@ require(
 	'jquery'
 	,'underscore'
 	,'backbone'
+	, 'OpenLayers'
 	,'test/drawn/view/ToolbarView'
 	
 	,'bootstrap'
 ],
-function($, _, Backbone, ToolbarView){
+function($, _, Backbone, OpenLayers, ToolbarView){
     $('body').bind('contextmenu',function(){
         return false;
     });

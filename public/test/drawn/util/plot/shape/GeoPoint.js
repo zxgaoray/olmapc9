@@ -1,6 +1,8 @@
 define('test/drawn/util/plot/shape/GeoPoint',
-[],
-function(){
+[
+    'OpenLayers'
+],
+function(OpenLayers){
     var GeoPoint = OpenLayers.Class(OpenLayers.Geometry.Point, {
         _controlPoints : []
         , initialize : function(point) {

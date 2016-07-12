@@ -1,8 +1,9 @@
 define('test/drawn/util/plot/shape/GeoArc',
 [
-    'test/drawn/util/plot/shape/GeoLinePlot'
+    'OpenLayers'
+    , 'test/drawn/util/plot/shape/GeoLinePlot'
 ],
-function(GeoLinePlot) {
+function(OpenLayers, GeoLinePlot) {
     var GeoArc = OpenLayers.Class(GeoLinePlot, {
         sides : 720
         , initialize : function(points) {

@@ -1,8 +1,9 @@
 define('test/drawn/util/plot/shape/GeoSector',
 [
-    'test/drawn/util/plot/shape/GeoPlot'
+    'OpenLayers'
+    , 'test/drawn/util/plot/shape/GeoPlot'
 ],
-function(GeoPlot){
+function(OpenLayers, GeoPlot){
     var GeoSector = OpenLayers.Class(GeoPlot, {
         direction : -1
         , initialize : function() {

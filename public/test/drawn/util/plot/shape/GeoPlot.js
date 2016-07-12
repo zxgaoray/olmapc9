@@ -1,7 +1,8 @@
 define('test/drawn/util/plot/shape/GeoPlot',
 [
+    'OpenLayers'
 ],
-function(){
+function(OpenLayers){
     var GeoPlot = OpenLayers.Class(OpenLayers.Geometry.Polygon, {
         _controlPoints : []
         , initialize : function(points) {
