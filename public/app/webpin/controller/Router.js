@@ -5,13 +5,15 @@ define('app/webpin/controller/Router',
     'backbone',
     'app/webpin/view/PinView',
     'app/webpin/view/CdnView'
+    , 'app/webpin/view/TestView'
 ],
-function($, _, Backbone, PinView, CdnView){
+function($, _, Backbone, PinView, CdnView, TestView){
     var r = Backbone.Router.extend({
         routes:{
             '':'home',
             'web_pins':'home',
             'cdn':'cdn'
+            , 'testview' : 'testview'
         },
         initialize:function(){
             this.views = {};
@@ -21,6 +23,9 @@ function($, _, Backbone, PinView, CdnView){
                 },
                 'cdnView':{
                     creator:CdnView
+                }
+                , 'testView' : {
+                    creator : TestView
                 }
             }
         },
@@ -40,8 +45,17 @@ function($, _, Backbone, PinView, CdnView){
             
             this._hideAllView();
             this._activeView('cdnView');
-        },
-        _createView:function(viewName){
+        }
+        , testview : function(){
+            if (!this.views.testView) {
+                this._createView('testView');
+                this.views.testView.fetchData();
+            }
+            
+            this._hideAllView();
+            this._activeView('testView');
+        }
+        , _createView:function(viewName){
             if (this.views[viewName]) return;
             var clazz = this.viewCreators[viewName].creator;
             this.views[viewName] = new clazz();
