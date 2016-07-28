@@ -1,0 +1,28 @@
+<style>
+    .form-field {
+        width: 200px;
+        height:24px;
+    }
+    
+    .form-field-name {
+        float:left;
+        width:80px;
+        
+    }
+    .form-field-value {
+        float:left;
+        width: 120px;
+    }
+</style>
+<div>
+    <% for (var i=0; i < fields.length; i++) { %>
+    <% var fieldName = fields[i].fieldName; %>
+    <% var fieldAlias = fields[i].fieldAlias; %>
+    <div class="form-field">
+        <div class="form-field-name"><%= fieldAlias %></div>
+        <div class="form-field-value"><%= user[fieldName] %></div>
+    </div>
+    
+    <% }; %>
+    
+</div>

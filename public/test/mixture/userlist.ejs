@@ -1,0 +1,47 @@
+<style>
+    .user-list {
+        position : absolute;
+        top:10px;
+        left:10px;
+        width:210px;
+        height:500px;
+    }
+    
+    .user-list-item {
+        height : 60px;
+        cursor : pointer;
+    }
+    .user-list-item.index {
+        float:left;
+        width : 20px;
+    }
+    .user-list-item.name {
+        float:left;
+        width : 80px;
+    }
+    .user-list-item.declare {
+        float:left;
+        width : 100px;
+    }
+</style>
+<div class="user-list">
+    <% for (var i=0; i < users.length; i++) { %>
+    <% var data = users[i]; %>
+    <div class="user-list-item" data="<%= data.id %>">
+        <!-- idx -->
+        <div class="user-list-item index">
+            <%= i %>
+        </div>
+        
+        <!-- name -->
+        <div class="user-list-item name">
+            <%= data.name %>
+        </div>
+        
+        <!-- declare  -->
+        <div class="user-list-item declare">
+            <%= data.declare %>
+        </div>
+    </div>
+    <% } %>
+</div>

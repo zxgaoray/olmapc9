@@ -11,7 +11,7 @@ require.config({
 	},
 	shim:{
 		'backbone' : ['underscore']
-		,'bootstrap' : ['jquery']
+		, 'bootstrap' : ['jquery']
 		, 'OpenLayers' : {
 			exports : 'OpenLayers'
 		}
