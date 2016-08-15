@@ -7,7 +7,8 @@ require.config({
         , 'OpenLayers' : 'https://cdn.bootcss.com/openlayers/2.13.1/OpenLayers'
         , 'text' : 'https://cdnjs.cloudflare.com/ajax/libs/require-text/2.0.12/text.min'
         , 'domReady' : 'https://cdn.bootcss.com/require-domReady/2.0.1/domReady.min'
-        , 'olext' : 'olext'
+        , 'olext' : '/jslib/olext'
+        , 'coordtransform' : '/jslib/coordtransform'
         , 'test':'/test'
     },
     shim:{

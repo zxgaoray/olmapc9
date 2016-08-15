@@ -40,6 +40,10 @@ router.get('/mixture', function(req, res, next) {
     res.render('test/mixture/index');
 })
 
+router.get('/transform', function(req, res, next) {
+    res.render('test/transform/index');
+})
+
 
 /*static map */
 

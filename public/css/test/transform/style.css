@@ -1,0 +1,23 @@
+.map-container {
+    position: absolute;
+    top: 0px;
+    bottom: 0px;
+    left: 0px;
+    right: 0px;
+}
+.map-baidu {
+    float: left;
+    width: 49.9%;
+    height: 100%;
+}
+.map-div-seperator {
+    float: left;
+    width: 0.2%;
+    height: 100%;
+    background-color: #000;
+}
+.map-gaode {
+    float: left;
+    width: 49.9%;
+    height: 100%;
+}
