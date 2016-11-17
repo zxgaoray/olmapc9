@@ -1,0 +1,22 @@
+{
+  "name": "geojs",
+  "description": "",
+  "main": "",
+  "authors": [
+    "zxgaoray <zxgao_ray@qq.com>"
+  ],
+  "license": "MIT",
+  "homepage": "https://github.com/zxgaoray/olmapc9",
+  "private": true,
+  "ignore": [
+    "**/.*",
+    "node_modules",
+    "bower_components",
+    "public/vendor",
+    "test",
+    "tests"
+  ],
+  "dependencies": {
+    "ol3": "ol3-dist#^3.18.2"
+  }
+}
