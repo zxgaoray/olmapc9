@@ -5,7 +5,7 @@ define('test/transform/view/BaiduMapView',
     , 'backbone'
     , 'OpenLayers'
     , 'olext/layer/cache/BaiduTiledCache'
-    , 'olext/layer/BaiduTiledLayer'
+    , 'olext/layer/BaiduTiledLayer2'
     , 'coordtransform'
 ],
 function($, _, Backbone, OpenLayers, BaiduTiledCache, BaiduTiledLayer, coordtransform){
