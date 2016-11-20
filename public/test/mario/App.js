@@ -6,10 +6,15 @@ define('test/mario/App',
     'marionette'
 ],
 function(_, Bb, BbRadio, Mn){
+    var GlobalRadio = BbRadio.extend({
+        
+    })
+    
     var App = Mn.Application.extend({
         //初始化
         initialize : function() {
-            
+            var globalRadio = new GlobalRadio();
+            this.globalRadio = globalRadio;
         },
         //启动app之前
         onBeforeStart : function() {
