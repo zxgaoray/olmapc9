@@ -2,6 +2,7 @@ var express = require('express');
 var router = express.Router();
 
 var modifyCtlr = require('../controller/test/staticmap/modify_controller');
+var marioCtlr = require('../controller/test/mario/index_controller');
 
 /* GET home page. */
 router.get('/', function(req, res, next) {
@@ -49,5 +50,7 @@ router.get('/transform', function(req, res, next) {
 
 router.get('/clusterPoints', modifyCtlr.clusterPoints);
 router.get('/animatedClusterPoints', modifyCtlr.animatedClusterPoints);
+
+router.get('/mario', marioCtlr.index);
 
 module.exports = router;

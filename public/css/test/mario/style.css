@@ -1,0 +1,51 @@
+html,body {
+    padding: 0px;
+    
+}
+
+#header-region {
+    position: absolute;
+    top: 0px;
+    left: 0px;
+    right: 0px;
+    height: 44px;
+    background-color: rgba(33,33,33, 0.4);
+}
+
+#map-region {
+    position: absolute;
+    top: 44px;
+    left: 0px;
+    right: 0px;
+    bottom: 24px;
+}
+
+#main-region {
+    
+}
+
+#footer-region {
+    position: absolute;
+    bottom: 0px;
+    height: 24px;
+    left: 0px;
+    right: 0px;
+    background-color: rgba(33,33,33,0.4);
+}
+
+#dialog-region {
+    
+}
+
+.ng-search-bar {
+    position: absolute;
+    top: 64px;
+    left: 80px;
+    height: 32px;
+    width: 220px;
+}
+
+.search-searchbar-searchTxt {
+    width: 180px;
+    line-height: 32px;
+}

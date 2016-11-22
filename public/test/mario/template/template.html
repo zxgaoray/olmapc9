@@ -1,0 +1,43 @@
+<!-- 模板 -->
+<div id="header-region">
+
+</div>
+<div id="map-region">
+    
+</div>
+<div id="main-region">
+    <div id="search"></div>
+</div>
+<div id="footer-region">
+    
+</div>
+<div id="dialog-region">
+    
+</div>
+
+<!-- 地图 -->
+<script type="x-template/underscore" id="tpl-map-mapview">
+    <div id="map-<%= mid %>" class="map ng-map"></div>
+</script>
+
+<!-- 搜索 -->
+<script type="x-template/underscore" id="tpl-search-searchview">
+    <div id="search-searchbar-<%= mid %>" class="ng-search-bar">
+        <span><input class="search-searchbar-searchTxt"/><button class="search-searchbar-searchButton">搜索</button></span>
+    </div>
+    
+    <div id="search-classify-<%= mid %>" class="ng-search-classify">
+    
+    </div>
+    
+    <div id="search-result-<%= mid %>" class="ng-search-result">
+    
+    </div>
+</script>
+
+<!-- toolbar -->
+<script type="x-template/underscore" id="tpl-toolbar-toolbarview">
+    <div>
+    
+    </div>
+</script>
