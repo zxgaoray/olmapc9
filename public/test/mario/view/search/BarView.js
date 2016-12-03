@@ -24,8 +24,8 @@ function (_, Bb, BBRadio, Mn) {
              */
             console.log('search-searchbar-searchButton : click : ' + txt);
 
-            this.trigger('search-bar-button-did-click', {
-                'searchText' : ''
+            this.trigger('search-button-did-click', {
+                'searchText' : this.getUI('searchTxt').val()
             });
         }
     });

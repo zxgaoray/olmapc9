@@ -35,21 +35,35 @@ function(_, Backbone, Radio, Marionette, Vig,
             //搜索条
             this.barView = new BarView({
             });
+            this.listenTo(this.barView, 'search-button-did-click', this._doSearch);
             this.barView.render();
 
             //搜索分类
             this.classifyView = new ClassifyView({
             });
-            this.classifyView.render();
+            //this.classifyView.render();
 
             //搜索结果列表
             this.resultView = new ResultView({
             });
-            this.resultView.render();
+            //this.resultView.render();
 
             this.getRegion('bar').show(this.barView);
 
+        },
+        _doSearch : function (evt) {
+            console.log(evt);
+
+        },
+        _testData : function () {
+            var data = [];
+            for (var i = 0; i < 30; i++) {
+                data.push({
+                    name : ''
+                })
+            }
         }
+
     });
     
     return SearchView;
