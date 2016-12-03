@@ -16,14 +16,14 @@
 </div>
 
 <!-- 地图 -->
-<script type="x-template/underscore" id="tpl-map-mapview">
+<script type="x-template/underscore" id="tpl-map-controller-map-view">
     <div id="map-<%= mid %>" class="map ng-map"></div>
 </script>
 
 <!-- 搜索 -->
-<script type="x-template/underscore" id="tpl-search-searchview">
+<script type="x-template/underscore" id="tpl-search-controller-search-view">
     <div id="search-searchbar-<%= mid %>" class="ng-search-bar">
-        <span><input class="search-searchbar-searchTxt"/><button class="search-searchbar-searchButton">搜索</button></span>
+        
     </div>
     
     <div id="search-classify-<%= mid %>" class="ng-search-classify">
@@ -35,8 +35,42 @@
     </div>
 </script>
 
+<!-- 搜索条 -->
+<script type="x-template/underscore" id="tpl-search-controller-search-bar">
+    <input class="search-searchbar-searchTxt"/>
+    <button class="search-searchbar-searchButton">搜索</button>
+</script>
+
+<!-- 搜索分类 -->
+<script type="x-template/underscore" id="tpl-search-controller-search-classify">
+    <div>
+        <ul class="">
+            <% for (var i=0; i < classify.length; i++){ %>
+                <% var item = classify[i]; %>
+                <li class="ng-search-classify classify" data="<%= classify.indexCode %>"><%= classify.name %></li>
+            <% } %>
+        </ul>
+    </div>
+</script>
+
+<!-- 搜索结果列表 -->
+<script type="x-template/underscore" id="tpl-search-controller-search-result">
+    <div>
+        <ul>
+            <% for (var i=0; i < list.length; i++) { %>
+                
+                <li class="ng-search-result-list-item" >
+                    <div>
+                        <div> </div>
+                    </div>
+                </li>
+            <% } %>
+        </ul>
+    </div>
+</script>
+
 <!-- toolbar -->
-<script type="x-template/underscore" id="tpl-toolbar-toolbarview">
+<script type="x-template/underscore" id="tpl-map-controller-toolbar-view">
     <div>
     
     </div>

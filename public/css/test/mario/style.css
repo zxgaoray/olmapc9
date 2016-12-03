@@ -42,10 +42,17 @@ html,body {
     top: 64px;
     left: 80px;
     height: 32px;
-    width: 220px;
+    width: 302px;
 }
 
 .search-searchbar-searchTxt {
-    width: 180px;
+    float: left;
+    width: 240px;
+    line-height: 32px;
+}
+
+.search-searchbar-searchButton {
+    float: left;
+    width: 60px;
     line-height: 32px;
 }

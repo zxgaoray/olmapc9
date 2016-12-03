@@ -106,8 +106,6 @@ function($, _, Backbone, Marionette, App){
     //初始化
     app.init();
     
-    
-    console.log(app.className());
-    
-    
 })
+
+

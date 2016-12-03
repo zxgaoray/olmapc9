@@ -24,7 +24,7 @@ function(_, Backbone, Radio, Marionette, Vig, MapView){
                     //element
                     el : mapRegion,
                     //
-                    template : '#tpl-map-mapview'
+                    template : '#tpl-map-controller-map-view'
                 });
                 //侦听地图初始化完成事件
                 this.listenTo(this.mapView, 'map-did-init', this._mapDidInitHandler);

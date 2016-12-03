@@ -30,7 +30,7 @@ function(_, Backbone, Radio, Marionette, Channel, ChannelEvent, SearchView){
             if (!this.searchView) {
                 this.searchView = new SearchView({
                     el : '#search',
-                    template : '#tpl-search-searchview'
+                    template : '#tpl-search-controller-search-view'
                 });
                 this.searchView.render();
             }
