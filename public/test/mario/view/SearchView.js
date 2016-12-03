@@ -5,17 +5,14 @@ define('test/mario/view/SearchView',
     'backbone',
     'backbone.radio',
     'marionette',
-    'test/mario/util/ViewIdGenerator'
+    'test/mario/util/ViewIdGenerator',
+    'test/mario/view/search/BarView',
+    'test/mario/view/search/ClassifyView',
+    'test/mario/view/search/ResultView'
 ],
-function(_, Backbone, Radio, Marionette, Vig){
+function(_, Backbone, Radio, Marionette, Vig,
+    BarView, ClassifyView, ResultView){
     var SearchView = Marionette.View.extend({
-        ui : {
-            'searchTxt' : '.search-searchbar-searchTxt',
-            'searchButton' : '.search-searchbar-searchButton'
-        },
-        events : {
-            'click @ui.searchButton' : '_seachButtonClickHandler'
-        },
         initialize : function() {
             this.mid = Vig.generate();  
         },
@@ -24,26 +21,34 @@ function(_, Backbone, Radio, Marionette, Vig){
                 mid : this.getOption('mid')
             }  
         },
-        _seachButtonClickHandler : function() {
-            var searchTxt = this.getUI('searchTxt');
-            var txt = searchTxt.val();
-            /*
-            var searchTxt = this.ui.searchTxt;
-            var txt = $(searchTxt).val();
-            */
-            console.log('search-searchbar-searchButton : click : ' + txt);  
-        },
         onRender : function() {
             var mid = this.getOption('mid');
             this.addRegions({
-                'bar' : '#search-seachbar-' + mid,
+                'bar' : '#search-searchbar-' + mid,
                 'classify' : '#search-classify-' + mid,
                 'result' : '#search-result-' + mid
             });
-            
-            
-            
-            console.log(this);
+
+            console.log(this.getRegion('bar'));
+
+
+            //搜索条
+            this.barView = new BarView({
+            });
+            this.barView.render();
+
+            //搜索分类
+            this.classifyView = new ClassifyView({
+            });
+            this.classifyView.render();
+
+            //搜索结果列表
+            this.resultView = new ResultView({
+            });
+            this.resultView.render();
+
+            this.getRegion('bar').show(this.barView);
+
         }
     });
     
