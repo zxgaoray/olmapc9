@@ -15,9 +15,11 @@ function (_, Bb, BBRadio, Mn) {
             'reopenButton' : '.search-searchbar-reopenButton'
         },
         events : {
-            'click @ui.searchButton' : '_seachButton_clickHandler',
+            'input @ui.searchTxt' : '_searchTxt_inputHandler',
+            'click @ui.searchButton' : '_searchButton_clickHandler',
             'click @ui.toggleButton' : '_toggleButton_clickHandler',
             'click @ui.reopenButton' : '_reopenButton_clickHandler'
+
         },
         showToggleButton : function () {
             var ui = this.getUI('toggleButton');
@@ -27,7 +29,13 @@ function (_, Bb, BBRadio, Mn) {
             var ui = this.getUI('reopenButton');
             ui.show();
         },
-        _seachButton_clickHandler : function() {
+        _searchTxt_inputHandler : function () {
+            var len = this.getUI('searchTxt').val().length;
+            if (len === 0) {
+                this.getUI('reopenButton').hide();
+            }
+        },
+        _searchButton_clickHandler : function() {
             var ui = this.getUI('searchTxt');
             var txt = ui.val();
             /*
