@@ -63,7 +63,7 @@ html,body {
 
 .ng-search-panel .ng-search-panel-list {
     position: absolute;
-    top: 20px;
+    top: 10px;
     left: 2px;
     right: 2px;
     bottom: 10px;
