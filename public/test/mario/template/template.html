@@ -37,17 +37,24 @@
 
 <!-- 搜索条 -->
 <script type="x-template/underscore" id="tpl-search-controller-search-bar">
-    <input class="search-searchbar-searchTxt"/>
-    <button class="search-searchbar-searchButton">搜索</button>
+    <div class="input-group">
+        <input class="form-control search-searchbar-searchTxt"/>
+        <span class="input-group-btn">
+            <div class="btn btn-default search-searchbar-toggleButton" style="display: none;width: 40px;">X</div>
+            <div class="btn btn-default search-searchbar-reopenButton" style="display: none;width: 40px;">三</div>
+            <div class="btn btn-primary search-searchbar-searchButton">搜索</div>
+        </span>
+
+    </div>
 </script>
 
 <!-- 搜索分类 -->
 <script type="x-template/underscore" id="tpl-search-controller-search-classify">
     <div>
-        <ul class="">
+        <ul class="list-group">
             <% for (var i=0; i < classify.length; i++){ %>
                 <% var item = classify[i]; %>
-                <li class="ng-search-classify classify" data="<%= classify.indexCode %>"><%= classify.name %></li>
+                <li class="ng-search-classify classify" data="<%= classify.code %>"><%= classify.name %></li>
             <% } %>
         </ul>
     </div>
@@ -55,17 +62,19 @@
 
 <!-- 搜索结果列表 -->
 <script type="x-template/underscore" id="tpl-search-controller-search-result">
-    <div>
-        <ul>
-            <% for (var i=0; i < list.length; i++) { %>
-                
-                <li class="ng-search-result-list-item" >
-                    <div>
-                        <div> </div>
-                    </div>
-                </li>
-            <% } %>
-        </ul>
+    <div class="panel panel-primary ng-search-panel">
+        <div class="ng-search-panel-list">
+            <ul id="search-list-ul-<%=mid%>" class="list-group elements-list ng-search-result-list">
+
+            </ul>
+        </div>
+
+    </div>
+</script>
+
+<script type="x-template/underscore" id="tpl-search-controller-search-result-item">
+    <div style="width: 200px;height:30px;">
+        <%= name %>
     </div>
 </script>
 

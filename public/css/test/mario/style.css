@@ -45,14 +45,27 @@ html,body {
     width: 302px;
 }
 
-.search-searchbar-searchTxt {
-    float: left;
-    width: 240px;
-    line-height: 32px;
+.ng-search-panel {
+    position: absolute;
+    top:120px;
+    left:80px;
+    bottom: 200px;
+    width: 300px;
+    max-height: 500px;
 }
 
-.search-searchbar-searchButton {
-    float: left;
-    width: 60px;
-    line-height: 32px;
+.ng-search-panel-hide-btn {
+    position: absolute;
+    right:4px;
+    float: right;
+    cursor: hand;
+}
+
+.ng-search-panel .ng-search-panel-list {
+    position: absolute;
+    top: 20px;
+    left: 2px;
+    right: 2px;
+    bottom: 10px;
+    overflow-y: auto;
 }

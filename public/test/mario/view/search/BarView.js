@@ -10,14 +10,26 @@ function (_, Bb, BBRadio, Mn) {
         template : '#tpl-search-controller-search-bar',
         ui : {
             'searchTxt' : '.search-searchbar-searchTxt',
-            'searchButton' : '.search-searchbar-searchButton'
+            'searchButton' : '.search-searchbar-searchButton',
+            'toggleButton' : '.search-searchbar-toggleButton',
+            'reopenButton' : '.search-searchbar-reopenButton'
         },
         events : {
-            'click @ui.searchButton' : '_seachButton_clickHandler'
+            'click @ui.searchButton' : '_seachButton_clickHandler',
+            'click @ui.toggleButton' : '_toggleButton_clickHandler',
+            'click @ui.reopenButton' : '_reopenButton_clickHandler'
+        },
+        showToggleButton : function () {
+            var ui = this.getUI('toggleButton');
+            ui.show();
+        },
+        showReopenButton : function () {
+            var ui = this.getUI('reopenButton');
+            ui.show();
         },
         _seachButton_clickHandler : function() {
-            var searchTxt = this.getUI('searchTxt');
-            var txt = searchTxt.val();
+            var ui = this.getUI('searchTxt');
+            var txt = ui.val();
             /*
              var searchTxt = this.ui.searchTxt;
              var txt = $(searchTxt).val();
@@ -27,6 +39,25 @@ function (_, Bb, BBRadio, Mn) {
             this.trigger('search-button-did-click', {
                 'searchText' : this.getUI('searchTxt').val()
             });
+
+            var ui1 = this.getUI('reopenButton');
+            ui1.hide();
+        },
+        _toggleButton_clickHandler : function () {
+            var ui = this.getUI('toggleButton');
+            ui.hide();
+            this.trigger('search-toggle-did-click');
+
+            var ui1 = this.getUI('reopenButton');
+            ui1.show();
+        },
+        _reopenButton_clickHandler : function () {
+            var ui = this.getUI('reopenButton');
+            ui.hide();
+            this.trigger('search-reopen-did-click');
+
+            var ui1 = this.getUI('toggleButton');
+            ui1.show();
         }
     });
 

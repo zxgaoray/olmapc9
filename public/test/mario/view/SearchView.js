@@ -36,6 +36,8 @@ function(_, Backbone, Radio, Marionette, Vig,
             this.barView = new BarView({
             });
             this.listenTo(this.barView, 'search-button-did-click', this._doSearch);
+            this.listenTo(this.barView, 'search-toggle-did-click', this._doListToggle);
+            this.listenTo(this.barView, 'search-reopen-did-click', this._doListReopen);
             this.barView.render();
 
             //搜索分类
@@ -45,8 +47,9 @@ function(_, Backbone, Radio, Marionette, Vig,
 
             //搜索结果列表
             this.resultView = new ResultView({
+                mid : Vig.generate()
             });
-            //this.resultView.render();
+
 
             this.getRegion('bar').show(this.barView);
 
@@ -54,14 +57,31 @@ function(_, Backbone, Radio, Marionette, Vig,
         _doSearch : function (evt) {
             console.log(evt);
 
+            this.resultView.render();
+            this.getRegion('result').show(this.resultView);
+
+            this.resultView.renderResult(this._testData());
+
+            this.barView.showToggleButton();
+
+        },
+        _doListToggle: function () {
+            this.resultView.hideResult();
+        },
+        _doListReopen : function () {
+            this.resultView.showResult();
         },
         _testData : function () {
             var data = [];
             for (var i = 0; i < 30; i++) {
                 data.push({
-                    name : ''
+                    name : 'name' + i,
+                    code : 'code' + i,
+                    des : 'des' + i,
+                    type : 'feature'
                 })
             }
+            return data;
         }
 
     });
