@@ -22,10 +22,27 @@ function($, _, Backbone, Radio, Mn, Vig, ol, TileParams){
         },
         initMap : function(mapdiv) {
             var baseLayer = this._initBaseLayer('gaode-vec');
+
+            var overlay = new ol.Overlay({
+                element : document.getElementById('popup'),
+                autoPan : true,
+                autoPanAnimation : {
+                    duration : 250
+                }
+            });
+
+
+
+
+
+            this.overlay = overlay;
+
             var map = new ol.Map({
                 //目标div
                 target : mapdiv,
                 renderer : 'canvas',
+                //覆盖物
+                overlays : [overlay],
                 //控制件
                 controls : [],
                 //图层
@@ -35,11 +52,19 @@ function($, _, Backbone, Radio, Mn, Vig, ol, TileParams){
                 //视图
                 view : new ol.View({
                     center : ol.proj.fromLonLat([120.21844, 30.2096]),
-                    zoom : 16
+                    zoom : 5
                 })
             });
 
             this.map = map;
+
+            var closer = document.getElementById('popup-closer');
+
+            closer.onclick = function() {
+                overlay.setPosition(undefined);
+                closer.blur();
+                return false;
+            };
 
             this._initBaseControl();
 
@@ -48,13 +73,18 @@ function($, _, Backbone, Radio, Mn, Vig, ol, TileParams){
             this.trigger('map-did-init');
 
             //加载wms服务
-            this._addWmsLayer();
+            //this._addWmsLayer();
 
-            //加载wfs
+            //按照过滤器加载wfs
             this._addWfsLayer();
+
+            //按照范围加载wfs
+            //this._addWfsLayer2();
 
             //加载矢量图
             this._addVectorLayer();
+
+
         },
         //初始化底图
         _initBaseLayer : function (type) {
@@ -212,54 +242,41 @@ function($, _, Backbone, Radio, Mn, Vig, ol, TileParams){
                         color: 'rgba(0, 0, 255, 1.0)',
                         width: 2
                     })
+                    /*
+                    fill : new ol.style.Fill({
+                        color : 'rgba(255,0,0,0.3)'
+                    })
+                    */
                 })
             });
 
             this.map.addLayer(vector);
             var map = this.map;
 
-            // generate a GetFeature request
-            /*
             var featureRequest = new ol.format.WFS().writeGetFeature({
                 srsName: 'EPSG:3857',
-                featureNS: 'http://openstreemap.org',
-                featurePrefix: 'osm',
-                featureTypes: ['water_areas'],
-                outputFormat: 'application/json',
-                filter: ol.format.ogc.filter.and(
-                    ol.format.ogc.filter.like('name', 'Mississippi*'),
-                    ol.format.ogc.filter.equalTo('waterway', 'riverbank')
-                )
-            });
-            */
-
-            // then post the request and add the received features to a layer
-            /*
-            fetch('https://ahocevar.com/geoserver/wfs', {
-                method: 'POST',
-                body: new XMLSerializer().serializeToString(featureRequest)
-            }).then(function(response) {
-                return response.json();
-            }).then(function(json) {
-                var features = new ol.format.GeoJSON().readFeatures(json);
-                vectorSource.addFeatures(features);
-                map.getView().fit(vectorSource.getExtent(), (map.getSize()));
-            });
-            */
-
-            var featureRequest = new ol.format.WFS().writeGetFeature({
-                srsName: 'EPSG:3857',
-                featureNS: 'http://127.0.0.1:8080/geoserver',
+                featureNS: 'http://www.openplans.org/walrus',
                 featurePrefix: 'walrus',
                 featureTypes: ['admreg_province'],
                 outputFormat: 'application/json',
-                filter: ol.format.ogc.filter.and(
-                    ol.format.ogc.filter.like('admincode', '330*'),
-                    ol.format.ogc.filter.equalTo('userid', 0)
-                )
+                filter: ol.format.ogc.filter.equalTo('userid', '0')
             });
 
-            fetch('http://localhost:8080/geoserver/wfs', {
+            var self = this;
+
+            /*
+            $.ajax({
+                url : 'http://127.0.0.1:8080/geoserver/wfs',
+                type : 'post',
+                head : new XMLSerializer().serializeToString(featureRequest),
+                success: function (json) {
+                    console.log(json);
+                }
+            });
+            */
+
+
+            fetch('http://127.0.0.1:8080/geoserver/wfs', {
                 method: 'POST',
                 body: new XMLSerializer().serializeToString(featureRequest)
             }).then(function(response) {
@@ -267,8 +284,51 @@ function($, _, Backbone, Radio, Mn, Vig, ol, TileParams){
             }).then(function(json) {
                 var features = new ol.format.GeoJSON().readFeatures(json);
                 vectorSource.addFeatures(features);
-                //map.getView().fit(vectorSource.getExtent(), (map.getSize()));
+
+                var selectSingleClick = new ol.interaction.Select();
+                self.map.addInteraction(selectSingleClick);
+                selectSingleClick.on('select', function (e) {
+                    var extent = e.selected[0].getGeometry().getExtent();
+                    var coord = [(extent[0] + extent[2])/2, (extent[1] + extent[3])/2];
+                    self.overlay.setPosition(coord);
+
+                    var data = {
+                        province : e.selected[0].getProperties()['province'],
+                        aliasname : e.selected[0].getProperties()['aliasname'],
+                        admincode : e.selected[0].getProperties()['admincode']
+                    };
+
+                    var template = _.template(templateString());
+
+                    $('#popup-content').html(template(data));
+
+                    console.log(e.selected[0].getProperties()['admincode']);
+
+                })
             });
+
+
+            function templateString() {
+                return '<div>' +
+                            '<div>行政区 ：<%=province%></div>' +
+                            '<div>简称 ： <%=aliasname%></div>' +
+                            '<div>编码 ： <%=admincode%></div>' +
+                        '</div>'
+            }
+
+            /*
+            var xml = ''
+            
+            $.ajax({
+                url : '',
+                type : 'post',
+                data : xml,
+                success : function (e) {
+                    console.log(e);
+                }
+            })
+            */
+
 
             //doit();
 
@@ -308,6 +368,57 @@ function($, _, Backbone, Radio, Mn, Vig, ol, TileParams){
                 if (req.readyState == 4) return;
                 req.send(postData);
             }
+        },
+        _addWfsLayer2 : function () {
+            var vectorSource = new ol.source.Vector({
+                format: new ol.format.GeoJSON(),
+                url: function(extent) {
+                    return 'http://127.0.0.1:8080/geoserver/wfs?service=WFS&' +
+                        'version=1.1.0&request=GetFeature&typename=walrus:admreg_province&' +
+                        'outputFormat=application/json&srsname=EPSG:3857&' +
+                        'bbox=' + extent.join(',') + ',EPSG:3857';
+                },
+                strategy: ol.loadingstrategy.bbox
+            });
+
+
+            var vector = new ol.layer.Vector({
+                source: vectorSource,
+                style: new ol.style.Style({
+                    stroke: new ol.style.Stroke({
+                        color: 'rgba(0, 0, 255, 1.0)',
+                        width: 2
+                    }),
+                    fill : new ol.style.Fill({
+                        color : 'rgba(255,0,0,0.5)'
+                    })
+                })
+            });
+
+            this.map.addLayer(vector);
+
+            var selectSingleClick = new ol.interaction.Select();
+
+            // select interaction working on "click"
+
+            this.map.addInteraction(selectSingleClick);
+
+            this.map.on('singleclick', function (e) {
+                console.log(e.coordinate);
+            })
+
+            var self = this;
+            selectSingleClick.on('select', function (e) {
+                console.log(e);
+                console.log(e.selected[0].getGeometry().getFirstCoordinate());
+                //self.overlay.setPosition(ol.proj.fromLonLat([120.2,30.2]), 'EPSG:3857');
+                self.overlay.setPosition(e.selected[0].getGeometry().getFirstCoordinate());
+
+                $('#popup-content').html('<div>行政区编号 : '+ e.selected[0].getProperties()['admincode'] + '</div>');
+
+                console.log(e.selected[0].getProperties()['admincode']);
+
+            })
         }
     });
     
