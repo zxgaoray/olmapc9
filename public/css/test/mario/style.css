@@ -39,8 +39,8 @@ html,body {
 
 .ng-search-bar {
     position: absolute;
-    top: 64px;
-    left: 80px;
+    top: 44px;
+    left: 42px;
     height: 32px;
     width: 352px;
 }
@@ -56,8 +56,8 @@ html,body {
 
 .ng-search-panel {
     position: absolute;
-    top:120px;
-    left:80px;
+    top:100px;
+    left:42px;
     bottom: 200px;
     width: 300px;
     max-height: 500px;

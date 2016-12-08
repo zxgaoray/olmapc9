@@ -21,7 +21,7 @@ function($, _, Backbone, Radio, Mn, Vig, ol, TileParams){
             }  
         },
         initMap : function(mapdiv) {
-            var baseLayer = this._initBaseLayer('tdt-vec');
+            var baseLayer = this._initBaseLayer('gaode-vec');
             var map = new ol.Map({
                 //目标div
                 target : mapdiv,
@@ -35,8 +35,7 @@ function($, _, Backbone, Radio, Mn, Vig, ol, TileParams){
                 //视图
                 view : new ol.View({
                     center : ol.proj.fromLonLat([120.21844, 30.2096]),
-                    zoom : 16,
-                    projection : 'EPSG:3857'
+                    zoom : 16
                 })
             });
 
@@ -44,10 +43,17 @@ function($, _, Backbone, Radio, Mn, Vig, ol, TileParams){
 
             this._initBaseControl();
 
-            this.map.addLayer(this._generateLayer('tdt-anno'));
+            //this.map.addLayer(this._generateLayer('tdt-anno'));
 
             this.trigger('map-did-init');
 
+            //加载wms服务
+            this._addWmsLayer();
+
+            //加载wfs
+            this._addWfsLayer();
+
+            //加载矢量图
             this._addVectorLayer();
         },
         //初始化底图
@@ -67,6 +73,16 @@ function($, _, Backbone, Radio, Mn, Vig, ol, TileParams){
             var scaleLine = new ol.control.ScaleLine();
 
             this.map.addControl(scaleLine);
+
+            var mousePosition = new ol.control.MousePosition({
+                undefinedHTML: '',
+                projection: 'EPSG:4326',
+                target : 'mouse-position',
+                coordinateFormat: function(coordinate) {
+                    return ol.coordinate.format(coordinate, '{x}, {y}', 4);
+                }
+            });
+            this.map.addControl(mousePosition);
 
         },
         //初始化控制件
@@ -89,7 +105,6 @@ function($, _, Backbone, Radio, Mn, Vig, ol, TileParams){
                 case 'tdt-ter':
                 case 'tdt-anno':
                     var url = TileParams.tileURL(type);
-                    console.log(url);
                     lyr = new ol.layer.Tile({
                         source : new ol.source.XYZ({
                             url : url
@@ -176,6 +191,123 @@ function($, _, Backbone, Radio, Mn, Vig, ol, TileParams){
             this.map.addLayer(vectorLayer);
 
             vectorLayer.getSource().addFeature(feature);
+        },
+        _addWmsLayer : function () {
+            var wms = new ol.layer.Image({
+                source: new ol.source.ImageWMS({
+                    url: 'http://localhost:8080/geoserver/walrus/wms',
+                    params: {'LAYERS': 'walrus:admreg_province'},
+                    serverType: 'geoserver'
+                })
+            });
+
+            this.map.addLayer(wms);
+        },
+        _addWfsLayer : function () {
+            var vectorSource = new ol.source.Vector();
+            var vector = new ol.layer.Vector({
+                source: vectorSource,
+                style: new ol.style.Style({
+                    stroke: new ol.style.Stroke({
+                        color: 'rgba(0, 0, 255, 1.0)',
+                        width: 2
+                    })
+                })
+            });
+
+            this.map.addLayer(vector);
+            var map = this.map;
+
+            // generate a GetFeature request
+            /*
+            var featureRequest = new ol.format.WFS().writeGetFeature({
+                srsName: 'EPSG:3857',
+                featureNS: 'http://openstreemap.org',
+                featurePrefix: 'osm',
+                featureTypes: ['water_areas'],
+                outputFormat: 'application/json',
+                filter: ol.format.ogc.filter.and(
+                    ol.format.ogc.filter.like('name', 'Mississippi*'),
+                    ol.format.ogc.filter.equalTo('waterway', 'riverbank')
+                )
+            });
+            */
+
+            // then post the request and add the received features to a layer
+            /*
+            fetch('https://ahocevar.com/geoserver/wfs', {
+                method: 'POST',
+                body: new XMLSerializer().serializeToString(featureRequest)
+            }).then(function(response) {
+                return response.json();
+            }).then(function(json) {
+                var features = new ol.format.GeoJSON().readFeatures(json);
+                vectorSource.addFeatures(features);
+                map.getView().fit(vectorSource.getExtent(), (map.getSize()));
+            });
+            */
+
+            var featureRequest = new ol.format.WFS().writeGetFeature({
+                srsName: 'EPSG:3857',
+                featureNS: 'http://127.0.0.1:8080/geoserver',
+                featurePrefix: 'walrus',
+                featureTypes: ['admreg_province'],
+                outputFormat: 'application/json',
+                filter: ol.format.ogc.filter.and(
+                    ol.format.ogc.filter.like('admincode', '330*'),
+                    ol.format.ogc.filter.equalTo('userid', 0)
+                )
+            });
+
+            fetch('http://localhost:8080/geoserver/wfs', {
+                method: 'POST',
+                body: new XMLSerializer().serializeToString(featureRequest)
+            }).then(function(response) {
+                return response.json();
+            }).then(function(json) {
+                var features = new ol.format.GeoJSON().readFeatures(json);
+                vectorSource.addFeatures(features);
+                //map.getView().fit(vectorSource.getExtent(), (map.getSize()));
+            });
+
+            //doit();
+
+            function doit()
+            {
+                var url = 'http://localhost:8080/geoserver/wfs';
+                var method = 'POST';
+                var postData =
+                    '<wfs:GetFeature\n'
+                    + '  service="WFS"\n'
+                    + '  version="1.0.0"\n'
+                    + '  outputFormat="GML2"\n'
+                    + '  xmlns:topp="http://www.openplans.org/topp"\n'
+                    + '  xmlns:wfs="http://www.opengis.net/wfs"\n'
+                    + '  xmlns:ogc="http://www.opengis.net/ogc"\n'
+                    + '  xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"\n'
+                    + '  xsi:schemaLocation="http://www.opengis.net/wfs\n'
+                    + '  http://schemas.opengis.net/wfs/1.0.0/WFS-basic.xsd">\n'
+                    + '  <wfs:Query typeName="topp:bc_roads">\n'
+                    + '    <ogc:Filter>\n'
+                    + '      <ogc:FeatureId fid="1"/>\n'
+                    + '    </ogc:Filter>\n'
+                    + '    </wfs:Query>\n'
+                    + '</wfs:GetFeature>\n';
+                var req = new XMLHttpRequest();
+                req.open("POST", url, true);
+                req.setRequestHeader('User-Agent', 'XMLHTTP/1.0');
+                req.setRequestHeader('Content-type', 'application/x-www-form-urlencoded');
+                req.onreadystatechange = function () {
+                    if (req.readyState != 4) return;
+                    if (req.status != 200 && req.status != 304) {
+                        alert('HTTP error ' + req.status);
+                        return;
+                    }
+                    console.log(req.responseText);
+                }
+                if (req.readyState == 4) return;
+                req.send(postData);
+            }
         }
     });
     
