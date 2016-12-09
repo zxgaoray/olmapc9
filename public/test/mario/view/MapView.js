@@ -73,7 +73,7 @@ function($, _, Backbone, Radio, Mn, Vig, ol, TileParams){
             this.trigger('map-did-init');
 
             //加载wms服务
-            //this._addWmsLayer();
+            this._addWmsLayer();
 
             //按照过滤器加载wfs
             this._addWfsLayer();
@@ -259,29 +259,39 @@ function($, _, Backbone, Radio, Mn, Vig, ol, TileParams){
                 featurePrefix: 'walrus',
                 featureTypes: ['admreg_province'],
                 outputFormat: 'application/json',
-                filter: ol.format.ogc.filter.equalTo('userid', '0')
+                filter: ol.format.ogc.filter.or(
+                    ol.format.ogc.filter.like('province', '浙江*'),
+                    ol.format.ogc.filter.equalTo('province', '江苏省')
+                )
+
             });
 
             var self = this;
 
+            var xml = new XMLSerializer().serializeToString(featureRequest);
+
             /*
-            $.ajax({
-                url : 'http://127.0.0.1:8080/geoserver/wfs',
-                type : 'post',
-                head : new XMLSerializer().serializeToString(featureRequest),
-                success: function (json) {
-                    console.log(json);
-                }
-            });
-            */
-
-
             fetch('http://127.0.0.1:8080/geoserver/wfs', {
                 method: 'POST',
-                body: new XMLSerializer().serializeToString(featureRequest)
+                body: xml
             }).then(function(response) {
                 return response.json();
             }).then(function(json) {
+                loadFeatures(json);
+            });
+            */
+
+            $.ajax({
+                url : 'http://127.0.0.1:8080/geoserver/wfs',
+                type : 'post',
+                contentType: 'application/json',
+                data : xml,
+                success: function (json) {
+                    loadFeatures(json);
+                }
+            });
+
+            function loadFeatures(json) {
                 var features = new ol.format.GeoJSON().readFeatures(json);
                 vectorSource.addFeatures(features);
 
@@ -304,8 +314,8 @@ function($, _, Backbone, Radio, Mn, Vig, ol, TileParams){
 
                     console.log(e.selected[0].getProperties()['admincode']);
 
-                })
-            });
+                });
+            }
 
 
             function templateString() {

@@ -37,6 +37,11 @@ html,body {
     
 }
 
+.ng-map {
+    width: 100%;
+    height: 100%;
+}
+
 .ng-search-bar {
     position: absolute;
     top: 44px;
