@@ -79,9 +79,11 @@ function($, _, Backbone, Radio, Mn, Vig, ol, TileParams){
             this._addWfsLayer();
 
             //按照范围加载wfs
-            //this._addWfsLayer2();
+            this._addWfsLayer2();
 
-            //加载矢量图
+
+
+            //加载矢量要素
             this._addVectorLayer();
 
 
@@ -185,17 +187,6 @@ function($, _, Backbone, Radio, Mn, Vig, ol, TileParams){
              };
              */
 
-            var image = new ol.style.Circle({
-                radius: 5,
-                fill: null,
-                stroke: new ol.style.Stroke({color: 'red', width: 1})
-            });
-
-            var styles = {
-                'Point': new ol.style.Style({
-                    image: image
-                })
-            };
             var coord = ol.proj.fromLonLat([120.21844, 30.2096], "EPSG:3857");
             var feature = new ol.Feature(new ol.geom.Point(coord));
             function createStyle(src, img) {
@@ -208,8 +199,10 @@ function($, _, Backbone, Radio, Mn, Vig, ol, TileParams){
                     }))
                 });
             }
+
             feature.set('style', createStyle('https://openlayers.org/en/v3.19.1/examples/data/icon.png', undefined));
             console.log(feature.getGeometry().getCoordinates());
+
 
 
             var vectorLayer = new ol.layer.Vector({
@@ -242,11 +235,6 @@ function($, _, Backbone, Radio, Mn, Vig, ol, TileParams){
                         color: 'rgba(0, 0, 255, 1.0)',
                         width: 2
                     })
-                    /*
-                    fill : new ol.style.Fill({
-                        color : 'rgba(255,0,0,0.3)'
-                    })
-                    */
                 })
             });
 
@@ -291,6 +279,7 @@ function($, _, Backbone, Radio, Mn, Vig, ol, TileParams){
                 }
             });
 
+            //加载
             function loadFeatures(json) {
                 var features = new ol.format.GeoJSON().readFeatures(json);
                 vectorSource.addFeatures(features);
@@ -298,26 +287,42 @@ function($, _, Backbone, Radio, Mn, Vig, ol, TileParams){
                 var selectSingleClick = new ol.interaction.Select();
                 self.map.addInteraction(selectSingleClick);
                 selectSingleClick.on('select', function (e) {
+                    var feature = e.selected[0];
+                    var type = feature.getGeometry().getType();
+
                     var extent = e.selected[0].getGeometry().getExtent();
                     var coord = [(extent[0] + extent[2])/2, (extent[1] + extent[3])/2];
                     self.overlay.setPosition(coord);
 
-                    var data = {
-                        province : e.selected[0].getProperties()['province'],
-                        aliasname : e.selected[0].getProperties()['aliasname'],
-                        admincode : e.selected[0].getProperties()['admincode']
-                    };
+                    var template = null;
+                    var data = null;
+                    switch (type) {
+                        case 'MultiPolygon' :
+                            data = {
+                                province : feature.getProperties()['province'],
+                                aliasname : feature.getProperties()['aliasname'],
+                                admincode : feature.getProperties()['admincode']
+                            };
 
-                    var template = _.template(templateString());
+                            template = _.template(templateString());
+                            break;
+                        case 'MultiPoint':
+                            data = {
+                                name : feature.getProperties()['name']
+                            };
+                            template = _.template(templateCityString());
+                            break;
+                        default :
+                            template = _.template('<div></div>');
+                            break;
+                    }
 
                     $('#popup-content').html(template(data));
-
-                    console.log(e.selected[0].getProperties()['admincode']);
 
                 });
             }
 
-
+            //行政区模板
             function templateString() {
                 return '<div>' +
                             '<div>行政区 ：<%=province%></div>' +
@@ -326,109 +331,40 @@ function($, _, Backbone, Radio, Mn, Vig, ol, TileParams){
                         '</div>'
             }
 
-            /*
-            var xml = ''
-            
-            $.ajax({
-                url : '',
-                type : 'post',
-                data : xml,
-                success : function (e) {
-                    console.log(e);
-                }
-            })
-            */
-
-
-            //doit();
-
-            function doit()
-            {
-                var url = 'http://localhost:8080/geoserver/wfs';
-                var method = 'POST';
-                var postData =
-                    '<wfs:GetFeature\n'
-                    + '  service="WFS"\n'
-                    + '  version="1.0.0"\n'
-                    + '  outputFormat="GML2"\n'
-                    + '  xmlns:topp="http://www.openplans.org/topp"\n'
-                    + '  xmlns:wfs="http://www.opengis.net/wfs"\n'
-                    + '  xmlns:ogc="http://www.opengis.net/ogc"\n'
-                    + '  xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"\n'
-                    + '  xsi:schemaLocation="http://www.opengis.net/wfs\n'
-                    + '  http://schemas.opengis.net/wfs/1.0.0/WFS-basic.xsd">\n'
-                    + '  <wfs:Query typeName="topp:bc_roads">\n'
-                    + '    <ogc:Filter>\n'
-                    + '      <ogc:FeatureId fid="1"/>\n'
-                    + '    </ogc:Filter>\n'
-                    + '    </wfs:Query>\n'
-                    + '</wfs:GetFeature>\n';
-                var req = new XMLHttpRequest();
-                req.open("POST", url, true);
-                req.setRequestHeader('User-Agent', 'XMLHTTP/1.0');
-                req.setRequestHeader('Content-type', 'application/x-www-form-urlencoded');
-                req.onreadystatechange = function () {
-                    if (req.readyState != 4) return;
-                    if (req.status != 200 && req.status != 304) {
-                        alert('HTTP error ' + req.status);
-                        return;
-                    }
-                    console.log(req.responseText);
-                }
-                if (req.readyState == 4) return;
-                req.send(postData);
+            //省会模板
+            function templateCityString() {
+                return '<div>城市 ：<%=name%></div>'
             }
         },
+        //省会
         _addWfsLayer2 : function () {
             var vectorSource = new ol.source.Vector({
                 format: new ol.format.GeoJSON(),
                 url: function(extent) {
                     return 'http://127.0.0.1:8080/geoserver/wfs?service=WFS&' +
-                        'version=1.1.0&request=GetFeature&typename=walrus:admreg_province&' +
+                        'version=1.1.0&request=GetFeature&typename=walrus:province_center&' +
                         'outputFormat=application/json&srsname=EPSG:3857&' +
                         'bbox=' + extent.join(',') + ',EPSG:3857';
                 },
                 strategy: ol.loadingstrategy.bbox
             });
 
+            var image = new ol.style.Circle({
+                radius : 10,
+                stroke : new ol.style.Stroke({color: 'yellow', width: 3}),
+                fill : new ol.style.Fill({
+                    color : 'orange'
+                })
+            });
 
             var vector = new ol.layer.Vector({
                 source: vectorSource,
                 style: new ol.style.Style({
-                    stroke: new ol.style.Stroke({
-                        color: 'rgba(0, 0, 255, 1.0)',
-                        width: 2
-                    }),
-                    fill : new ol.style.Fill({
-                        color : 'rgba(255,0,0,0.5)'
-                    })
+                    image : image
                 })
             });
 
             this.map.addLayer(vector);
-
-            var selectSingleClick = new ol.interaction.Select();
-
-            // select interaction working on "click"
-
-            this.map.addInteraction(selectSingleClick);
-
-            this.map.on('singleclick', function (e) {
-                console.log(e.coordinate);
-            })
-
-            var self = this;
-            selectSingleClick.on('select', function (e) {
-                console.log(e);
-                console.log(e.selected[0].getGeometry().getFirstCoordinate());
-                //self.overlay.setPosition(ol.proj.fromLonLat([120.2,30.2]), 'EPSG:3857');
-                self.overlay.setPosition(e.selected[0].getGeometry().getFirstCoordinate());
-
-                $('#popup-content').html('<div>行政区编号 : '+ e.selected[0].getProperties()['admincode'] + '</div>');
-
-                console.log(e.selected[0].getProperties()['admincode']);
-
-            })
         }
     });
     
