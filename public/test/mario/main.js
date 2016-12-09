@@ -41,6 +41,12 @@ var __dependences = {
         path : '/vendor/ol3/',
         minimize : 'ol',
         debug : 'ol-debug'
+    },
+    'highcharts' : {
+        ctx : __ctx,
+        path : '/vendor/highcharts/',
+        minimize : 'highcharts',
+        debug : 'highcharts'
     }
 }
 

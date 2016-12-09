@@ -8,7 +8,8 @@ define('test/mario/view/MapView',
     'marionette',
     'test/mario/util/ViewIdGenerator',
     'ol3',
-    'test/mario/gis/TileParams'
+    'test/mario/gis/TileParams',
+    'highcharts'
 ],
 function($, _, Backbone, Radio, Mn, Vig, ol, TileParams){
     var MapView = Mn.View.extend({
@@ -30,10 +31,6 @@ function($, _, Backbone, Radio, Mn, Vig, ol, TileParams){
                     duration : 250
                 }
             });
-
-
-
-
 
             this.overlay = overlay;
 
@@ -85,6 +82,9 @@ function($, _, Backbone, Radio, Mn, Vig, ol, TileParams){
 
             //加载矢量要素
             this._addVectorLayer();
+
+            //加载图标
+            this._addCharts();
 
 
         },
@@ -216,6 +216,8 @@ function($, _, Backbone, Radio, Mn, Vig, ol, TileParams){
             vectorLayer.getSource().addFeature(feature);
         },
         _addWmsLayer : function () {
+            //region 3857
+            /*
             var wms = new ol.layer.Image({
                 source: new ol.source.ImageWMS({
                     url: 'http://localhost:8080/geoserver/walrus/wms',
@@ -225,6 +227,20 @@ function($, _, Backbone, Radio, Mn, Vig, ol, TileParams){
             });
 
             this.map.addLayer(wms);
+            */
+            //endregion
+
+            //region 4326
+            var wms = new ol.layer.Image({
+                source: new ol.source.ImageWMS({
+                    url: 'http://localhost:8080/geoserver/walrus/wms',
+                    params: {'LAYERS': 'walrus:province_region_4326'},
+                    serverType: 'geoserver'
+                })
+            });
+
+            this.map.addLayer(wms);
+            //endregion
         },
         _addWfsLayer : function () {
             var vectorSource = new ol.source.Vector();
@@ -365,7 +381,73 @@ function($, _, Backbone, Radio, Mn, Vig, ol, TileParams){
             });
 
             this.map.addLayer(vector);
+        },
+        _addCharts : function () {
+            var pie = new ol.Overlay({
+                position: ol.proj.fromLonLat([121.21844, 30.2096], "EPSG:3857"),
+                positioning: ol.OverlayPositioning.CENTER_CENTER,
+                element: document.getElementById('canvasDiv')
+            });
+            this.map.addOverlay(pie);
+            $(function () {
+                $('#canvasDiv').highcharts({
+                    chart: {
+                        backgroundColor: 'rgba(255, 255, 255, 0)',
+                        plotBorderColor: null,
+                        plotBackgroundColor: null,
+                        plotBackgroundImage: null,
+                        plotBorderWidth: null,
+                        plotShadow: false,
+                        width: 200,
+                        height: 200
+                    },
+                    tooltip: {
+                        pointFormat: '{series.name}: <b>{point.percentage:.1f}%</b>'
+                    },
+                    plotOptions: {
+                        pie: {
+                            allowPointSelect: true,
+                            cursor: 'pointer'
+                        }
+                    },
+                    title: {
+                        text: ''
+                    },
+                    dataLabels: {
+                        enabled: false,
+                        color: '#000000',
+                        //distance: -20,
+                        connectorColor: '#000000',
+                        formatter: function() {
+                            return '<b>'+ this.point.name +'</b>: '+ this.percentage +' %';
+                        }
+
+                    },
+                    series: [{
+                        type: 'pie',
+                        name: 'Browser share',
+                        data: [
+                            ['Firefox', 45.0],
+                            ['IE', 26.8],
+                            {
+                                name: 'Chrome',
+                                y: 12.8,
+                                sliced: true,
+                                selected: true
+                            },
+                            ['Safari', 8.5],
+                            ['Opera', 6.2],
+                            ['Others', 0.7]
+                        ]
+                    }]
+                });
+            })
+
+
+
         }
+
+
     });
     
     return MapView;
