@@ -47,6 +47,18 @@ var __dependences = {
         path : '/vendor/highcharts/',
         minimize : 'highcharts',
         debug : 'highcharts'
+    },
+    'chartjs' : {
+        ctx : __ctx,
+        path : '/vendor/chart.js/dist/',
+        minimize : 'Chart.bundle',
+        debug : 'Chart'
+    },
+    'turfjs' : {
+        ctx : __ctx,
+        path : '/vendor/turfjs/',
+        minimize : 'turf.min',
+        debug : 'turf.min'
     }
 }
 

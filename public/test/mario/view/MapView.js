@@ -9,9 +9,12 @@ define('test/mario/view/MapView',
     'test/mario/util/ViewIdGenerator',
     'ol3',
     'test/mario/gis/TileParams',
-    'highcharts'
+    'turfjs',
+    'highcharts',
+    'chartjs'
+
 ],
-function($, _, Backbone, Radio, Mn, Vig, ol, TileParams){
+function($, _, Backbone, Radio, Mn, Vig, ol, TileParams, turf){
     var MapView = Mn.View.extend({
         initialize : function() {
             this.mid = Vig.generate();
@@ -48,7 +51,8 @@ function($, _, Backbone, Radio, Mn, Vig, ol, TileParams){
                 ],
                 //视图
                 view : new ol.View({
-                    center : ol.proj.fromLonLat([120.21844, 30.2096]),
+                    projection : 'EPSG:3857',
+                    center : ol.proj.fromLonLat([120.21844, 30.2096], 'EPSG:3857'),
                     zoom : 5
                 })
             });
@@ -86,6 +90,17 @@ function($, _, Backbone, Radio, Mn, Vig, ol, TileParams){
             //加载图标
             this._addCharts();
 
+            //使用渲染器
+            this._renderGeometry();
+
+            //使用chart.js
+            this._addChartJS();
+
+            //tin
+            this._turfTin();
+
+            //缓冲区
+            this._turfBuffer();
 
         },
         //初始化底图
@@ -124,6 +139,7 @@ function($, _, Backbone, Radio, Mn, Vig, ol, TileParams){
         _template : function() { 
             return '<div id="mainMap" class="map ngmap"></div>';
         },
+        //创建layer
         _generateLayer : function (type) {
             var lyr;
             switch (type) {
@@ -139,7 +155,8 @@ function($, _, Backbone, Radio, Mn, Vig, ol, TileParams){
                     var url = TileParams.tileURL(type);
                     lyr = new ol.layer.Tile({
                         source : new ol.source.XYZ({
-                            url : url
+                            url : url,
+                            projection : 'EPSG:3857'
                         })
                     });
                     break;
@@ -158,6 +175,7 @@ function($, _, Backbone, Radio, Mn, Vig, ol, TileParams){
 
             return lyr;
         },
+        //创建矢量layer
         _addVectorLayer : function () {
             var geojsonObject = {
                 'type': 'FeatureCollection',
@@ -176,17 +194,6 @@ function($, _, Backbone, Radio, Mn, Vig, ol, TileParams){
                 }]
             };
 
-            /*
-             {
-             'type': 'Feature',
-             'geometry': {
-             'type': 'Point',
-             'coordinates': [120.21844, 30.2096]
-             }
-
-             };
-             */
-
             var coord = ol.proj.fromLonLat([120.21844, 30.2096], "EPSG:3857");
             var feature = new ol.Feature(new ol.geom.Point(coord));
             function createStyle(src, img) {
@@ -201,9 +208,6 @@ function($, _, Backbone, Radio, Mn, Vig, ol, TileParams){
             }
 
             feature.set('style', createStyle('https://openlayers.org/en/v3.19.1/examples/data/icon.png', undefined));
-            console.log(feature.getGeometry().getCoordinates());
-
-
 
             var vectorLayer = new ol.layer.Vector({
                 source : new ol.source.Vector(),
@@ -215,6 +219,7 @@ function($, _, Backbone, Radio, Mn, Vig, ol, TileParams){
 
             vectorLayer.getSource().addFeature(feature);
         },
+        //添加wms层
         _addWmsLayer : function () {
             //region 3857
             /*
@@ -233,7 +238,7 @@ function($, _, Backbone, Radio, Mn, Vig, ol, TileParams){
             //region 4326
             var wms = new ol.layer.Image({
                 source: new ol.source.ImageWMS({
-                    url: 'http://localhost:8080/geoserver/walrus/wms',
+                    url: 'http://10.21.131.19:8080/geoserver/walrus/wms',
                     params: {'LAYERS': 'walrus:province_region_4326'},
                     serverType: 'geoserver'
                 })
@@ -242,6 +247,7 @@ function($, _, Backbone, Radio, Mn, Vig, ol, TileParams){
             this.map.addLayer(wms);
             //endregion
         },
+        //添加wfs层
         _addWfsLayer : function () {
             var vectorSource = new ol.source.Vector();
             var vector = new ol.layer.Vector({
@@ -286,7 +292,7 @@ function($, _, Backbone, Radio, Mn, Vig, ol, TileParams){
             */
 
             $.ajax({
-                url : 'http://127.0.0.1:8080/geoserver/wfs',
+                url : 'http://10.21.131.19:8080/geoserver/wfs',
                 type : 'post',
                 contentType: 'application/json',
                 data : xml,
@@ -357,7 +363,7 @@ function($, _, Backbone, Radio, Mn, Vig, ol, TileParams){
             var vectorSource = new ol.source.Vector({
                 format: new ol.format.GeoJSON(),
                 url: function(extent) {
-                    return 'http://127.0.0.1:8080/geoserver/wfs?service=WFS&' +
+                    return 'http://10.21.131.19:8080/geoserver/wfs?service=WFS&' +
                         'version=1.1.0&request=GetFeature&typename=walrus:province_center&' +
                         'outputFormat=application/json&srsname=EPSG:3857&' +
                         'bbox=' + extent.join(',') + ',EPSG:3857';
@@ -382,9 +388,10 @@ function($, _, Backbone, Radio, Mn, Vig, ol, TileParams){
 
             this.map.addLayer(vector);
         },
+        //highcharts as overlay
         _addCharts : function () {
             var pie = new ol.Overlay({
-                position: ol.proj.fromLonLat([121.21844, 30.2096], "EPSG:3857"),
+                position: ol.proj.fromLonLat([126.21844, 30.2096], "EPSG:3857"),
                 positioning: ol.OverlayPositioning.CENTER_CENTER,
                 element: document.getElementById('canvasDiv')
             });
@@ -441,12 +448,253 @@ function($, _, Backbone, Radio, Mn, Vig, ol, TileParams){
                         ]
                     }]
                 });
-            })
+            });
+        },
+        //canvas image charts
+        _renderGeometry : function () {
+            var canvas = document.createElement('canvas');
+            var vectorContext = ol.render.toContext(canvas.getContext('2d'),
+                {
+                    size : [100, 100]
+                }
+            );
 
 
 
+            var style = new ol.style.Style({
+                fill: new ol.style.Fill({
+                    color : 'rgba(0,0,255,0.7)'
+                }),
+                stroke: new ol.style.Stroke({
+                    color : 'white'
+                })
+            });
+            vectorContext.setStyle(style);
+
+            ol.geom.Sector = function (center, randius, sAngle, eAngle) {
+                sAngle = sAngle % 360;
+                eAngle = eAngle % 360;
+                var m = eAngle - sAngle;
+                var points = [];
+                points.push(center);
+                var ep = null;
+                for (var i = 0; i <= m; ++i) {
+                    var x = center[0] + randius * Math.cos(degreeToRadian(sAngle + i));
+                    var y = center[1] + randius * Math.sin(degreeToRadian(sAngle + i));
+                    points.push([x, y]);
+                }
+                points.push(center);
+                return new ol.geom.Polygon([points]);
+            };
+
+            var degreeToRadian = function (degree) {
+                return Math.PI * degree / 180;
+            };
+
+            var sec = new ol.geom.Sector([40, 40], 30, 0, 120);
+            vectorContext.drawGeometry(sec);
+
+            var style2 = new ol.style.Style({
+                fill : new ol.style.Fill({
+                    color : 'rgba(255,0,0, 0.7)'
+                }),
+                stroke : new ol.style.Stroke({
+                    color : 'white'
+                })
+            });
+
+            vectorContext.setStyle(style2);
+            var sec2 = new ol.geom.Sector([40,40], 30, 120, 210);
+            vectorContext.drawGeometry(sec2);
+
+            var style3 = new ol.style.Style({
+                fill : new ol.style.Fill({
+                    color : 'rgba(0,255,0,0.7)'
+                }),
+                stroke : new ol.style.Stroke({
+                    color : 'white'
+                })
+            });
+            vectorContext.setStyle(style3);
+            var sec3 = new ol.geom.Sector([40, 40], 30, 210, 359.9);
+            vectorContext.drawGeometry(sec3);
+
+            var coord = ol.proj.fromLonLat([120.21844, 31.2096], "EPSG:3857");
+            var feature = new ol.Feature(new ol.geom.Point(coord));
+
+            var style = new ol.style.Style({
+                image : new ol.style.Icon({
+                    img : canvas,
+                    imgSize : [100, 100],
+                    rotation : 0
+                })
+            });
+
+            var vectorLayer = new ol.layer.Vector({
+                source : new ol.source.Vector(),
+                style: style
+            });
+            this.map.addLayer(vectorLayer);
+
+            vectorLayer.getSource().addFeature(feature);
+        },
+        //使用chart.js
+        _addChartJS : function () {
+            var canvas = $('body').append('<div id="canvasDiv2" style="width: 400px;height: 300px;"><canvas id="myChart"></canvas></div>')
+            //获取canvas context
+            var ctx = document.getElementById("myChart");
+            var myChart = new Chart(ctx, {
+                type: 'bar',
+                data: {
+                    labels: ["Red", "Blue", "Yellow", "Green", "Purple", "Orange"],
+                    datasets: [{
+                        label: '# of Votes',
+                        data: [12, 19, 3, 5, 2, 3],
+                        backgroundColor: [
+                            'rgba(255, 99, 132, 0.2)',
+                            'rgba(54, 162, 235, 0.2)',
+                            'rgba(255, 206, 86, 0.2)',
+                            'rgba(75, 192, 192, 0.2)',
+                            'rgba(153, 102, 255, 0.2)',
+                            'rgba(255, 159, 64, 0.2)'
+                        ],
+                        borderColor: [
+                            'rgba(255,99,132,1)',
+                            'rgba(54, 162, 235, 1)',
+                            'rgba(255, 206, 86, 1)',
+                            'rgba(75, 192, 192, 1)',
+                            'rgba(153, 102, 255, 1)',
+                            'rgba(255, 159, 64, 1)'
+                        ],
+                        borderWidth: 1
+                    }]
+                },
+                options: {
+                    scales: {
+                        yAxes: [{
+                            ticks: {
+                                beginAtZero:true
+                            }
+                        }]
+                    }
+                }
+            });
+
+            var bar = new ol.Overlay({
+                position : ol.proj.fromLonLat([122, 18], 'EPSG:3857'),
+                positioning : ol.OverlayPositioning.CENTER_CENTER,
+                element : document.getElementById('canvasDiv2')
+            });
+
+            this.map.addOverlay(bar);
+        },
+        //TIN
+        _turfTin : function () {
+            /*
+            var extent = this.map.getView().calculateExtent(this.map.getSize());
+            var points = turf.random('points', 30, {
+                bbox: extent
+            });
+            */
+            var points = turf.random('points', 30, {
+                bbox: [50, 30, 70, 50]
+            });
+            for (var i = 0; i < points.features.length; i++) {
+                points.features[i].properties.z = ~~(Math.random() * 9);
+            }
+            var tin = turf.tin(points, 'z');
+            for (var i = 0; i < tin.features.length; i++) {
+                var properties  = tin.features[i].properties;
+                properties.fill = '#' + properties.a +
+                    properties.b + properties.c;
+            }
+
+            var source1 = new ol.source.Vector({
+                features: (new ol.format.GeoJSON()).readFeatures(points, {featureProjection : 'EPSG:3857'})
+            });
+
+            var source2 = new ol.source.Vector({
+                features: (new ol.format.GeoJSON()).readFeatures(tin, {featureProjection : 'EPSG:3857'})
+            });
+
+            var vl1 = new ol.layer.Vector({
+                source : source1,
+                style : new ol.style.Style({
+                    image : new ol.style.Circle({
+                        radius : 6,
+                        fill : new ol.style.Fill({
+                            color : 'black'
+                        }),
+                        stroke : new ol.style.Stroke({
+                            color : 'red'
+                        })
+                    })
+                })
+            });
+
+            var vl2 = new ol.layer.Vector({
+                source : source2,
+                style : new ol.style.Style({
+                    fill : new ol.style.Fill({
+                        color : 'rgba(255,255,0,0.5)'
+                    }),
+                    stroke : new ol.style.Stroke({
+                        color : 'orange'
+                    })
+                })
+            });
+
+            this.map.addLayer(vl2);
+
+            this.map.addLayer(vl1);
+        },
+        //缓冲区
+        _turfBuffer : function () {
+            var pt = {
+                "type": "Feature",
+                "properties": {},
+                "geometry": {
+                    "type": "LineString",
+                    "coordinates": [[160, 34],[163,30]]
+                }
+            };
+            var unit = 'miles';
+
+            var buffered = turf.buffer(pt, 500, unit);
+
+            var source1 = new ol.source.Vector({
+                features: (new ol.format.GeoJSON()).readFeatures(pt, {featureProjection : 'EPSG:3857'})
+            });
+
+            var source2 = new ol.source.Vector({
+                features: (new ol.format.GeoJSON()).readFeatures(buffered, {featureProjection : 'EPSG:3857'})
+            });
+
+            var vl1 = new ol.layer.Vector({
+                source : source1,
+                style : new ol.style.Style({
+                    stroke : new ol.style.Stroke({
+                        color : 'blue'
+                    })
+                })
+            });
+
+            var vl2 = new ol.layer.Vector({
+                source : source2,
+                style : new ol.style.Style({
+                    fill : new ol.style.Fill({
+                        color : 'rgba(255,255,0,0.5)'
+                    }),
+                    stroke : new ol.style.Stroke({
+                        color : 'orange'
+                    })
+                })
+            });
+
+            this.map.addLayer(vl2);
+
+            this.map.addLayer(vl1);
         }
-
 
     });
     
