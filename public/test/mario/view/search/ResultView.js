@@ -98,4 +98,4 @@ function ($, _, Bb, BbRadio, Mn, Vig) {
     });
     
     return ResultView;
-})
+});

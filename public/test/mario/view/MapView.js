@@ -14,7 +14,7 @@ define('test/mario/view/MapView',
     'chartjs'
 
 ],
-function($, _, Backbone, Radio, Mn, Vig, ol, TileParams, turf){
+function($, _, Backbone, Radio, Mn, Vig, ol, TileParams, turf, Highcharts){
     var MapView = Mn.View.extend({
         initialize : function() {
             this.mid = Vig.generate();
@@ -24,9 +24,11 @@ function($, _, Backbone, Radio, Mn, Vig, ol, TileParams, turf){
                 mid : this.getOption('mid')
             }  
         },
+        //region 创建地图
         initMap : function(mapdiv) {
+            //底图图层
             var baseLayer = this._initBaseLayer('gaode-vec');
-
+            //气泡
             var overlay = new ol.Overlay({
                 element : document.getElementById('popup'),
                 autoPan : true,
@@ -34,9 +36,8 @@ function($, _, Backbone, Radio, Mn, Vig, ol, TileParams, turf){
                     duration : 250
                 }
             });
-
             this.overlay = overlay;
-
+            //地图对象
             var map = new ol.Map({
                 //目标div
                 target : mapdiv,
@@ -59,6 +60,7 @@ function($, _, Backbone, Radio, Mn, Vig, ol, TileParams, turf){
 
             this.map = map;
 
+            //气泡关闭
             var closer = document.getElementById('popup-closer');
 
             closer.onclick = function() {
@@ -67,23 +69,25 @@ function($, _, Backbone, Radio, Mn, Vig, ol, TileParams, turf){
                 return false;
             };
 
+            //控件
             this._initBaseControl();
 
             //this.map.addLayer(this._generateLayer('tdt-anno'));
 
             this.trigger('map-did-init');
 
+            //region 服务
             //加载wms服务
             this._addWmsLayer();
 
-            //按照过滤器加载wfs
+            //wfs 行政区多边形
             this._addWfsLayer();
 
-            //按照范围加载wfs
+            //wfs 行政区点
             this._addWfsLayer2();
+            //endregion
 
-
-
+            //region 要素
             //加载矢量要素
             this._addVectorLayer();
 
@@ -102,18 +106,20 @@ function($, _, Backbone, Radio, Mn, Vig, ol, TileParams, turf){
             //缓冲区
             this._turfBuffer();
 
+            //动画
+            this._animation();
+
+            //spline
+            this._spline();
+
+            //endregion
+
         },
+        //endregion
+        //region 私有
         //初始化底图
         _initBaseLayer : function (type) {
             return this._generateLayer(type);
-        },
-        //初始化切片图层
-        _initTileLayer : function () {
-
-        },
-        //初始化graphic图层
-        _initGraphicLayer : function () {
-
         },
         //初始化基础控制件
         _initBaseControl : function () {
@@ -130,10 +136,6 @@ function($, _, Backbone, Radio, Mn, Vig, ol, TileParams, turf){
                 }
             });
             this.map.addControl(mousePosition);
-
-        },
-        //初始化控制件
-        _initControl : function () {
 
         },
         _template : function() { 
@@ -177,24 +179,7 @@ function($, _, Backbone, Radio, Mn, Vig, ol, TileParams, turf){
         },
         //创建矢量layer
         _addVectorLayer : function () {
-            var geojsonObject = {
-                'type': 'FeatureCollection',
-                'crs': {
-                    'type': 'name',
-                    'properties': {
-                        'name': 'EPSG:4326'
-                    }
-                },
-                'features': [{
-                    'type': 'Feature',
-                    'geometry': {
-                        'type': 'Point',
-                        'coordinates': [120.21844, 30.2096]
-                    }
-                }]
-            };
-
-            var coord = ol.proj.fromLonLat([120.21844, 30.2096], "EPSG:3857");
+            var coord = ol.proj.fromLonLat([126.89, 37.55], "EPSG:3857");
             var feature = new ol.Feature(new ol.geom.Point(coord));
             function createStyle(src, img) {
                 return new ol.style.Style({
@@ -247,7 +232,7 @@ function($, _, Backbone, Radio, Mn, Vig, ol, TileParams, turf){
             this.map.addLayer(wms);
             //endregion
         },
-        //添加wfs层
+        //省级行政区 矢量
         _addWfsLayer : function () {
             var vectorSource = new ol.source.Vector();
             var vector = new ol.layer.Vector({
@@ -358,7 +343,7 @@ function($, _, Backbone, Radio, Mn, Vig, ol, TileParams, turf){
                 return '<div>城市 ：<%=name%></div>'
             }
         },
-        //省会
+        //省会 矢量
         _addWfsLayer2 : function () {
             var vectorSource = new ol.source.Vector({
                 format: new ol.format.GeoJSON(),
@@ -387,67 +372,107 @@ function($, _, Backbone, Radio, Mn, Vig, ol, TileParams, turf){
             });
 
             this.map.addLayer(vector);
+
+            this._provinceCenterLayer = vector;
         },
         //highcharts as overlay
         _addCharts : function () {
             var pie = new ol.Overlay({
-                position: ol.proj.fromLonLat([126.21844, 30.2096], "EPSG:3857"),
+                position: ol.proj.fromLonLat([141, 20], "EPSG:3857"),
                 positioning: ol.OverlayPositioning.CENTER_CENTER,
                 element: document.getElementById('canvasDiv')
             });
             this.map.addOverlay(pie);
             $(function () {
-                $('#canvasDiv').highcharts({
-                    chart: {
-                        backgroundColor: 'rgba(255, 255, 255, 0)',
-                        plotBorderColor: null,
-                        plotBackgroundColor: null,
-                        plotBackgroundImage: null,
-                        plotBorderWidth: null,
-                        plotShadow: false,
-                        width: 200,
-                        height: 200
-                    },
-                    tooltip: {
-                        pointFormat: '{series.name}: <b>{point.percentage:.1f}%</b>'
-                    },
-                    plotOptions: {
-                        pie: {
-                            allowPointSelect: true,
-                            cursor: 'pointer'
-                        }
-                    },
-                    title: {
-                        text: ''
-                    },
-                    dataLabels: {
-                        enabled: false,
-                        color: '#000000',
-                        //distance: -20,
-                        connectorColor: '#000000',
-                        formatter: function() {
-                            return '<b>'+ this.point.name +'</b>: '+ this.percentage +' %';
-                        }
+                $(document).ready(function () {
+                    Highcharts.chart('canvasDiv', {
+                        credits : {
+                            text : ''
+                        },
+                        chart: {
+                            backgroundColor: 'rgba(255, 255, 255, 0)',
+                            plotBorderColor: null,
+                            plotBackgroundColor: null,
+                            plotBackgroundImage: null,
+                            plotBorderWidth: null,
+                            plotShadow: false,
+                            width: 160,
+                            height: 160,
+                            margin : 0,
+                            borderRadius : 80
+                        },
 
-                    },
-                    series: [{
-                        type: 'pie',
-                        name: 'Browser share',
-                        data: [
-                            ['Firefox', 45.0],
-                            ['IE', 26.8],
-                            {
+                        /*
+                        chart: {
+                            plotBackgroundColor: null,
+                            plotBorderWidth: null,
+                            plotShadow: false,
+                            type: 'pie'
+                        },
+                        */
+                        tooltip: {
+                            pointFormat: '{series.name}: <b>{point.percentage:.1f}%</b>'
+                        },
+                        /*
+                        plotOptions: {
+                            pie: {
+                                allowPointSelect: true,
+                                cursor: 'pointer'
+                            },
+                        },
+                        */
+                        plotOptions: {
+                            pie: {
+                                allowPointSelect: true,
+                                cursor: 'pointer',
+                                dataLabels: {
+                                    enabled: false
+                                },
+                                showInLegend: false
+                            }
+                        },
+
+                        title: null,
+
+                        dataLabels: {
+                            enabled: false,
+                            color: '#000000',
+                            //distance: -20,
+                            connectorColor: '#000000',
+                            formatter: function () {
+                                return '<b>' + this.point.name + '</b>: ' + this.percentage + ' %';
+                            }
+
+                        },
+
+                        series: [{
+                            type: 'pie',
+                            name: 'Browser share',
+                            data: [{
+                                name: 'MSIE',
+                                y: 56.33
+                            }, {
                                 name: 'Chrome',
-                                y: 12.8,
+                                y: 24.03,
                                 sliced: true,
                                 selected: true
-                            },
-                            ['Safari', 8.5],
-                            ['Opera', 6.2],
-                            ['Others', 0.7]
-                        ]
-                    }]
+                            }, {
+                                name: 'Firefox',
+                                y: 10.38
+                            }, {
+                                name: 'Safari',
+                                y: 4.77
+                            }, {
+                                name: 'Opera',
+                                y: 0.91
+                            }, {
+                                name: 'other',
+                                y: 0.2
+                            }]
+                        }]
+                    });
                 });
+
             });
         },
         //canvas image charts
@@ -519,7 +544,7 @@ function($, _, Backbone, Radio, Mn, Vig, ol, TileParams, turf){
             var sec3 = new ol.geom.Sector([40, 40], 30, 210, 359.9);
             vectorContext.drawGeometry(sec3);
 
-            var coord = ol.proj.fromLonLat([120.21844, 31.2096], "EPSG:3857");
+            var coord = ol.proj.fromLonLat([128, 20], "EPSG:3857");
             var feature = new ol.Feature(new ol.geom.Point(coord));
 
             var style = new ol.style.Style({
@@ -581,7 +606,7 @@ function($, _, Backbone, Radio, Mn, Vig, ol, TileParams, turf){
             });
 
             var bar = new ol.Overlay({
-                position : ol.proj.fromLonLat([122, 18], 'EPSG:3857'),
+                position : ol.proj.fromLonLat([144, 30], 'EPSG:3857'),
                 positioning : ol.OverlayPositioning.CENTER_CENTER,
                 element : document.getElementById('canvasDiv2')
             });
@@ -655,12 +680,12 @@ function($, _, Backbone, Radio, Mn, Vig, ol, TileParams, turf){
                 "properties": {},
                 "geometry": {
                     "type": "LineString",
-                    "coordinates": [[160, 34],[163,30]]
+                    "coordinates": [[160, 34],[163,30], [158, 26]]
                 }
             };
-            var unit = 'miles';
+            var unit = 'meters';
 
-            var buffered = turf.buffer(pt, 500, unit);
+            var buffered = turf.buffer(pt, 50000, unit);
 
             var source1 = new ol.source.Vector({
                 features: (new ol.format.GeoJSON()).readFeatures(pt, {featureProjection : 'EPSG:3857'})
@@ -694,9 +719,168 @@ function($, _, Backbone, Radio, Mn, Vig, ol, TileParams, turf){
             this.map.addLayer(vl2);
 
             this.map.addLayer(vl1);
-        }
+        },
+        //animation
+        _animation : function () {
+            var self = this;
+            var style = new ol.style.Style({
+                image : new ol.style.Circle({
+                    radius : 10,
+                    fill : new ol.style.Fill({
+                        color : 'rgba(0, 255, 0, 0.6)'
+                    }),
+                    stroke : new ol.style.Stroke({
+                        color : 'white'
+                    })
 
+                })
+            });
+
+            var coord = ol.proj.fromLonLat([137, 35]);
+            var x = coord[0], y=coord[1];
+            var r = 500000;
+            var theta = 0;
+
+            this.map.on('postcompose', function (event) {
+                var vectorContext = event.vectorContext;
+                var frameState = event.frameState;
+
+                theta = 2 * Math.PI * frameState.time/10000;
+
+                var x1 = x + r * Math.cos(theta);
+                var y1 = y + r * Math.sin(theta);
+
+                var coord1 = [x1, y1];
+
+                vectorContext.setStyle(style);
+                vectorContext.drawGeometry(new ol.geom.Point(coord1));
+
+                self.map.render();
+
+            });
+            //this.map.render();
+        },
+        _spline : function () {
+            var self = this;
+            $('#spline').click(function () {
+                var source = self._provinceCenterLayer.getSource();
+                var features = source.getFeatures();
+
+                var f = features[0];
+                var x = f.getGeometry().getCoordinates()[0][0];
+                var y = f.getGeometry().getCoordinates()[0][1];
+
+                //region 循环
+                var curveSource = new ol.source.Vector();
+                for (var i=1; i < features.length; i++) {
+                    var f1 = features[i];
+
+                    var x1 = f1.getGeometry().getCoordinates()[0][0];
+                    var y1 = f1.getGeometry().getCoordinates()[0][1];
+
+                    var xM = x + (x1 - x) / 1.8;
+                    var yM = y + (y1 - y) / 1.8;
+
+                    //var distance = turf.distance(from, to, 'miles');
+                    var distance = Math.sqrt(Math.pow(x1-x, 2) + Math.pow(y1-y, 2));
+
+                    xM = xM + distance * 0.14;
+
+                    var line = {
+                        "type": "Feature",
+                        "geometry": {
+                            "type": "LineString",
+                            "coordinates": [
+                                [x,y],
+                                [xM, yM],
+                                [x1, y1]
+                            ]
+                        }
+                    };
+
+                    var curve = turf.bezier(line);
+
+                    curveSource.addFeatures((new ol.format.GeoJSON()).readFeatures(curve))
+                }
+                var layer = new ol.layer.Vector({
+                    source : curveSource,
+                    style : [
+                        new ol.style.Style({
+                            stroke : new ol.style.Stroke({
+                                color : 'white',
+                                width : 3
+                            })
+                        }),
+                        new ol.style.Style({
+                            stroke : new ol.style.Stroke({
+                                color : 'rgba(31,144,256,1)',
+                                width : 2
+                            })
+                        })
+                    ]
+
+                });
+                //endregion
+
+                /*
+                //region 单个
+                var f1 = features[1];
+
+                var x = f.getGeometry().getCoordinates()[0][0];
+                var y = f.getGeometry().getCoordinates()[0][1];
+
+                var x1 = f1.getGeometry().getCoordinates()[0][0];
+                var y1 = f1.getGeometry().getCoordinates()[0][1];
+
+                var xM = (x1 + x) / 2;
+                var yM = (y1 + y) / 2;
+
+                //var distance = turf.distance(from, to, 'miles');
+                var distance = Math.sqrt(Math.pow(x1-x, 2) + Math.pow(y1-y, 2));
+
+                console.log(distance);
+
+                xM = xM + distance * 0.1;
+
+                var line = {
+                    "type": "Feature",
+                    "geometry": {
+                        "type": "LineString",
+                        "coordinates": [
+                            [x,y],
+                            [xM, yM],
+                            [x1, y1]
+                        ]
+                    }
+                };
+
+                console.log(line);
+
+                var curve = turf.bezier(line);
+
+
+
+                var layer = new ol.layer.Vector({
+                    source : new ol.source.Vector({
+                        features: (new ol.format.GeoJSON()).readFeatures(curve)
+                    }),
+                    style : new ol.style.Style({
+                        stroke : new ol.style.Stroke({
+                            color : 'red',
+                            width : 2
+                        })
+                    })
+                });
+                //endregion
+                */
+
+                self.map.addLayer(layer);
+
+            });
+
+        }
+        //endregion
     });
     
     return MapView;
-})
+});

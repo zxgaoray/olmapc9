@@ -7,4 +7,4 @@ define('test/mario/gis/LayerCreator',
 ],
 function (ol) {
 
-})
+});

@@ -11,4 +11,4 @@ function(){
         //Global Map
         MAP_DID_INIT : 'map-did-init'
     }
-})
+});

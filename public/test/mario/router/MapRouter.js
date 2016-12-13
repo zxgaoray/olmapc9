@@ -23,4 +23,4 @@ function(_, Backbone, Marionette, MapController){
     });
     
     return MapRouter;
-})
+});

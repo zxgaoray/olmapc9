@@ -87,4 +87,4 @@ function(_, Backbone, Radio, Marionette, Vig,
     });
     
     return SearchView;
-})
+});

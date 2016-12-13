@@ -11,4 +11,4 @@ function(){
         //主模板
         url_main_template : ctx + '/test/mario/template/template.html'
     }
-})
+});

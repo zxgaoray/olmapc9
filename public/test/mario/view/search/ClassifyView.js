@@ -21,4 +21,4 @@ function (_, Bb, BbRadio, Mn) {
     });
 
     return View;
-})
+});

@@ -1,6 +1,6 @@
 //页面的main
 
-//全局变量
+//region   全局变量
 (!__ctx) ? __ctx = "" : "";
 //__debug = false;
 (!__debug) ? __debug = false : true;
@@ -82,17 +82,46 @@ if (__debug) {
 
 __paths['test'] = __ctx + '/test';
 
-console.log(__paths);
-
 //依赖配置
 var __config = {
     paths : __paths,
     shim : {
-        
+        'highcharts' : {
+            exports : 'Highcharts'
+        }
     }
 }
+//endregion
 
 require.config(__config);
+
+/*
+//region require AMD
+
+require.config({
+    paths : {
+        'jquery' : __ctx + '/vendor/jquery-dist/jquery.min',
+        'underscore' : __ctx + '/vendor/underscore/underscore-min',
+        'backbone' : __ctx + '/vendor/backbone/backbone-min',
+        'backbone.radio' : __ctx + '/vendor/backbone.radio/build/backbone.radio.min',
+        'marionette' : __ctx + '/vendor/backbone.marionette/lib/backbone.marionette.min',
+        'ol3' : __ctx + '/vendor/ol3/ol',
+        'highcharts' : __ctx + '/vendor/highcharts/highcharts',
+        'chartjs' : __ctx + '/vendor/chart.js/dist/Chart.bundle',
+        'turfjs' : __ctx + '/vendor/turfjs/turf.min',
+
+        'test' : '/test'
+
+    },
+    shim : {
+        'highcharts' : {
+            exports : 'Highcharts'
+        }
+    }
+});
+
+//endregion
+*/
 
 //入口
 require(
@@ -112,7 +141,8 @@ function($, _, Backbone, Marionette, App){
             'footerRegion' : '#footer-region',
             'dialogRegion' : '#dialog-region'
         }
-    }
+    };
+
     //实例化
     var app = new App();
     
@@ -124,6 +154,6 @@ function($, _, Backbone, Marionette, App){
     //初始化
     app.init();
     
-})
+});
 
 

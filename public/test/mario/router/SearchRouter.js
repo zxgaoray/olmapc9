@@ -21,4 +21,4 @@ function(_, Backbone, Marionette, SearchController){
     });
     
     return SearchRouter;
-})
+});
