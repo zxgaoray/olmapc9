@@ -762,7 +762,9 @@ function($, _, Backbone, Radio, Mn, Vig, ol, TileParams, turf, Highcharts){
         },
         _spline : function () {
             var self = this;
+            //region 生成曲线
             $('#spline').click(function () {
+                if (self._curveLayer) return;
                 var source = self._provinceCenterLayer.getSource();
                 var features = source.getFeatures();
 
@@ -820,6 +822,9 @@ function($, _, Backbone, Radio, Mn, Vig, ol, TileParams, turf, Highcharts){
                     ]
 
                 });
+
+                self._curveLayer = layer;
+                
                 //endregion
 
                 /*
@@ -877,7 +882,117 @@ function($, _, Backbone, Radio, Mn, Vig, ol, TileParams, turf, Highcharts){
                 self.map.addLayer(layer);
 
             });
+            //endregion
 
+            //region 同步动画
+            var sync = false;
+            $('#sync').click(function () {
+                if (!self._curveLayer) return;
+                var now = new Date().getTime();
+
+                var curveSource = self._curveLayer.getSource();
+
+                if (!curveSource) return;
+
+                self.map.on('postcompose', function (event) {
+                    if (sync === false) return;
+                    var vectorContext = event.vectorContext;
+                    var frameState = event.frameState;
+
+
+                    var features = curveSource.getFeatures();
+
+                    var style = new ol.style.Style({
+                        image : new ol.style.Circle({
+                            radius : 4,
+                            fill : new ol.style.Fill({
+                                color : 'rgba(31,144,256,1)'
+                            })
+
+                        })
+                    });
+
+                    vectorContext.setStyle(style);
+
+
+                    var n = parseInt((frameState.time - now)/10);
+
+                    for (var i = 0; i < features.length; i ++) {
+                        var feature = features[i];
+                        var fc = feature.getGeometry().getCoordinates();
+                        var coord = fc[n % (fc.length)];
+
+
+                        vectorContext.drawGeometry(new ol.geom.Point(coord));
+
+                    }
+                    self.map.render();
+
+                });
+                sync = !sync;
+            });
+            //endregion
+
+            //region 异步动画
+            var async = false;
+
+            $('#async').click(function () {
+                if (!self._curveLayer) return;
+
+                var curveSource = self._curveLayer.getSource();
+
+                if (!curveSource) return;
+
+                var n = 0;
+                var features = curveSource.getFeatures();
+
+                self.map.on('postcompose', function (event) {
+                    if (async === false) return;
+                    var vectorContext = event.vectorContext;
+                    var frameState = event.frameState;
+
+                    var style = new ol.style.Style({
+                        image : new ol.style.Circle({
+                            radius : 4,
+                            fill : new ol.style.Fill({
+                                color : 'rgba(31,144,256,1)'
+                            })
+
+                        })
+                    });
+
+                    vectorContext.setStyle(style);
+
+                    var go = 20 * n;
+
+                    for (var i = 0; i < features.length; i ++) {
+                        var feature = features[i];
+                        var fc = feature.getGeometry().getCoordinates();
+
+                        var geojson = (new ol.format.GeoJSON()).writeFeatureObject(feature, {featureProjection: 'EPSG:3857'});
+                        var dis = turf.lineDistance(geojson, 'kilometers');
+
+                        var index = parseInt(go * fc.length / dis);
+                        var coord = fc[index%fc.length];
+                        vectorContext.drawGeometry(new ol.geom.Point(coord));
+
+                        /*
+                        var adis = go % dis;
+                        var p = turf.along(geojson, adis, 'kilometers');
+                        vectorContext.drawGeometry(new ol.geom.Point(p.geometry.coordinates));
+                        */
+
+
+
+                    }
+                    self.map.render();
+                    n++;
+                });
+
+                async = !async;
+            });
+
+            //endregion
         }
         //endregion
     });
