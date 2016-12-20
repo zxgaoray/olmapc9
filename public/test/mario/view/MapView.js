@@ -886,6 +886,7 @@ function($, _, Backbone, Radio, Mn, Vig, ol, TileParams, turf, Highcharts){
 
             //region 同步动画
             var sync = false;
+            var syncAnim = null;
             $('#sync').click(function () {
                 if (!self._curveLayer) return;
                 var now = new Date().getTime();
@@ -894,8 +895,16 @@ function($, _, Backbone, Radio, Mn, Vig, ol, TileParams, turf, Highcharts){
 
                 if (!curveSource) return;
 
-                self.map.on('postcompose', function (event) {
-                    if (sync === false) return;
+                if (sync === true) {
+                    if (syncAnim){
+                        self.map.unByKey(syncAnim);
+                    }
+
+                    sync = false;
+                    return;
+                }
+
+                syncAnim = self.map.on('postcompose', function (event) {
                     var vectorContext = event.vectorContext;
                     var frameState = event.frameState;
 
@@ -934,7 +943,9 @@ function($, _, Backbone, Radio, Mn, Vig, ol, TileParams, turf, Highcharts){
             //endregion
 
             //region 异步动画
-            var async = false;
+            var aSync = false;
+
+            var asyncAnim = null;
 
             $('#async').click(function () {
                 if (!self._curveLayer) return;
@@ -943,11 +954,16 @@ function($, _, Backbone, Radio, Mn, Vig, ol, TileParams, turf, Highcharts){
 
                 if (!curveSource) return;
 
+                if (aSync === true) {
+                    self.map.unByKey(asyncAnim);
+                    aSync = false;
+                    return;
+                }
+
                 var n = 0;
                 var features = curveSource.getFeatures();
 
-                self.map.on('postcompose', function (event) {
-                    if (async === false) return;
+                asyncAnim = self.map.on('postcompose', function (event) {
                     var vectorContext = event.vectorContext;
                     var frameState = event.frameState;
 
@@ -989,7 +1005,7 @@ function($, _, Backbone, Radio, Mn, Vig, ol, TileParams, turf, Highcharts){
                     n++;
                 });
 
-                async = !async;
+                aSync = !aSync;
             });
 
             //endregion
