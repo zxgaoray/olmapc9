@@ -39,4 +39,4 @@ function(_, Backbone, Radio, Marionette, Channel, ChannelEvent, SearchView){
     
     //返回module
     return SearchController;
-})
+});

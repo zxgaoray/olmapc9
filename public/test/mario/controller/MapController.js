@@ -39,7 +39,7 @@ function(_, Backbone, Radio, Marionette, Vig, MapView){
         _mapDidInitHandler : function() {
             console.log('MapController : _mapDidInitHandler');
         }
-    })
+    });
     
     return MapController;
-})
+});

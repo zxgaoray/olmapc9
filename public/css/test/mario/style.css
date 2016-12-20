@@ -14,10 +14,10 @@ html,body {
 
 #map-region {
     position: absolute;
-    top: 44px;
+    top: 0px;
     left: 0px;
     right: 0px;
-    bottom: 24px;
+    bottom: 0px;
 }
 
 #main-region {
@@ -37,22 +37,49 @@ html,body {
     
 }
 
+.ng-map {
+    width: 100%;
+    height: 100%;
+}
+
 .ng-search-bar {
     position: absolute;
-    top: 64px;
-    left: 80px;
+    top: 44px;
+    left: 42px;
     height: 32px;
-    width: 302px;
+    width: 352px;
 }
 
-.search-searchbar-searchTxt {
-    float: left;
-    width: 240px;
-    line-height: 32px;
+.app-main-title {
+    position: absolute;
+    top: 20px;
+    left: 80px;
+    width: 300px;
+    height: 60px;
+
 }
 
-.search-searchbar-searchButton {
-    float: left;
-    width: 60px;
-    line-height: 32px;
+.ng-search-panel {
+    position: absolute;
+    top:100px;
+    left:42px;
+    bottom: 200px;
+    width: 300px;
+    max-height: 500px;
+}
+
+.ng-search-panel-hide-btn {
+    position: absolute;
+    right:4px;
+    float: right;
+    cursor: hand;
+}
+
+.ng-search-panel .ng-search-panel-list {
+    position: absolute;
+    top: 10px;
+    left: 2px;
+    right: 2px;
+    bottom: 10px;
+    overflow-y: auto;
 }

@@ -36,7 +36,7 @@ function($, _, Bb, BbRadio, Mn, MapRouter, SearchRouter, Channel, ChannelEvent, 
             console.log('ctx : ' + AjaxUrl.getCtx());
             //预加载模板
             $.ajax({
-                url : AjaxUrl.url_main_template,
+                url : AjaxUrl.url_main_template + '?_ds=' + new Date().getTime(),
                 success : function(scripts) {
                     $('body').append(scripts);
                     //预加载模板完成
