@@ -42,7 +42,7 @@ function($, _, Bb, ol){
         ],
         view: view,
         target: 'my-map'
-    })
+    });
     
     var map2 = new ol.Map({
         layers: [
@@ -50,7 +50,49 @@ function($, _, Bb, ol){
         ],
         view: view,
         target: 'my-map-2'
-    })
+    });
+
+    //region 加载栅格数据
+    var wmslayer = new ol.layer.Image({
+        source: new ol.source.ImageWMS({
+            url: 'http://localhost:8080/geoserver/walrus/wms',
+            params: {'LAYERS': 'walrus:province_region_4326'},
+            serverType: 'geoserver'
+        })
+    });
+    map2.addLayer(wmslayer);
+    //endregion
+
+    //region 加载矢量数据
+    var vectorSource = new ol.source.Vector({
+        format: new ol.format.GeoJSON(),
+        url: function(extent) {
+            return 'http://localhost:8080/geoserver/wfs?service=WFS&' +
+                'version=1.1.0&request=GetFeature&typename=walrus:province_center&' +
+                'outputFormat=application/json&srsname=EPSG:3857&' +
+                'bbox=' + extent.join(',') + ',EPSG:3857';
+        },
+        strategy: ol.loadingstrategy.bbox
+    });
+
+    var image = new ol.style.Circle({
+        radius : 10,
+        stroke : new ol.style.Stroke({color: 'yellow', width: 3}),
+        fill : new ol.style.Fill({
+            color : 'orange'
+        })
+    });
+
+    var vector = new ol.layer.Vector({
+        source: vectorSource,
+        style: new ol.style.Style({
+            image : image
+        })
+    });
+
+    map.addLayer(vector);
+    //endregion
+
     
     function actUICommand(command) {
         switch (command) {
@@ -92,7 +134,7 @@ function($, _, Bb, ol){
             default:
                 // code
         }
-    }
+    };
     
     $('.command .btn').click(function(){
         var command = $(this).attr('data');
@@ -102,4 +144,4 @@ function($, _, Bb, ol){
     
     
     
-})
+});
