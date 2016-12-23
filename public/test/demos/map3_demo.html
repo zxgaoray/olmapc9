@@ -1,0 +1,84 @@
+<!DOCTYPE html>
+<html>
+<head>
+    <link rel="stylesheet" href="/vendor/bootstrap/dist/css/bootstrap.css" type="text/css" />
+    <link rel="stylesheet" href="/vendor/inspinia/dist/inspinia.css" type="text/css" />
+    <link rel="stylesheet" href="/vendor/ol3/ol.css" type="text/css" />
+    <style type="text/css">
+        #header {
+            position:absolute;
+            top:0px;
+            left:0px;
+            right:0px;
+            height:44px;
+        }
+        #my-map {
+            position: absolute;
+            top: 44px;
+            left: 0px;
+            width:50%;
+            bottom:44px;
+        }
+        
+        #my-map-2 {
+            position: absolute;
+            top: 44px;
+            right: 0px;
+            width:50%;
+            bottom:44px;
+        }
+        
+        #footer {
+            position:absolute;
+            height:44px;
+            left:0px;
+            right:0px;
+            bottom:0px;
+            background-color:white;
+        }
+        
+        #swapMap {
+            width:100px;  
+            height:32px;  
+            position:absolute;  
+            left:50%;  
+            top:50%;  
+            margin:-16px 0 0 -50px 
+        }
+        .map-title {
+            color : white;
+            line-height:44px;
+            font-size : 28px;
+            margin-left:20px;
+        }
+        .command {
+            width:320px;  
+            height:32px;  
+            position:absolute;  
+            left:50%;  
+            top:50%;  
+            margin:-16px 0 0 -160px 
+        }
+        
+    </style>
+</head>
+<body style="padding:0px;margin:0px;width:100%;height:100%;">
+    <div id="header" >
+        <div class="map-title">地图View</div>
+    </div>
+    <div id="my-map"></div>
+    <div id="my-map-2"></div>
+    <div id="footer">
+        <div class="btn-group command">
+            <div class="btn btn-primary" data="left">左移</div>
+            <div class="btn btn-primary" data="right">右移</div>
+            <div class="btn btn-primary" data="top">上移</div>
+            <div class="btn btn-primary" data="down">下移</div>
+            <div class="btn btn-primary" data="zoom-in">放大</div>
+            <div class="btn btn-primary" data="zoom-out">缩小</div>
+        </div>    
+    </div>
+    
+</body>
+<script type="text/javascript" src="/vendor/requirejs/require.js" data-main="/test/demos/map3_demo.js"></script>
+</html>

@@ -223,7 +223,7 @@ function($, _, Backbone, Radio, Mn, Vig, ol, TileParams, turf, Highcharts){
             //region 4326
             var wms = new ol.layer.Image({
                 source: new ol.source.ImageWMS({
-                    url: 'http://10.21.131.19:8080/geoserver/walrus/wms',
+                    url: 'http://localhost:8080/geoserver/walrus/wms',
                     params: {'LAYERS': 'walrus:province_region_4326'},
                     serverType: 'geoserver'
                 })
@@ -277,7 +277,7 @@ function($, _, Backbone, Radio, Mn, Vig, ol, TileParams, turf, Highcharts){
             */
 
             $.ajax({
-                url : 'http://10.21.131.19:8080/geoserver/wfs',
+                url : 'http://localhost:8080/geoserver/wfs',
                 type : 'post',
                 contentType: 'application/json',
                 data : xml,
@@ -348,7 +348,7 @@ function($, _, Backbone, Radio, Mn, Vig, ol, TileParams, turf, Highcharts){
             var vectorSource = new ol.source.Vector({
                 format: new ol.format.GeoJSON(),
                 url: function(extent) {
-                    return 'http://10.21.131.19:8080/geoserver/wfs?service=WFS&' +
+                    return 'http://localhost:8080/geoserver/wfs?service=WFS&' +
                         'version=1.1.0&request=GetFeature&typename=walrus:province_center&' +
                         'outputFormat=application/json&srsname=EPSG:3857&' +
                         'bbox=' + extent.join(',') + ',EPSG:3857';
